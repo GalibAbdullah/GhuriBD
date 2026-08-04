@@ -44,6 +44,12 @@ class AuthenticationTest extends TestCase
 
         $this->post('/login', [
             'email' => $user->email,
+            'password' => 'wrong-password',
+            'remember' => 'on',
+        ])->assertSessionHasErrors('email')->assertSessionHasInput('remember', 'on');
+
+        $this->post('/login', [
+            'email' => $user->email,
             'password' => 'Password123!',
             'remember' => 'on',
         ])->assertRedirect('/');

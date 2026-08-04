@@ -2,7 +2,7 @@
 
 @section('content')
     <h2 class="h3 fw-bold mb-2">Reset password</h2>
-    <p class="text-muted mb-4">Enter your email to receive a reset link.</p>
+    <p class="text-muted mb-4">Enter your email address and we will send a password reset link.</p>
 
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
