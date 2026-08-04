@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -24,4 +25,25 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
+
+Route::middleware(['auth', 'traveler'])->group(function (): void {
+    Route::view('/traveler', 'rbac.role-access', [
+        'role' => UserRole::TRAVELER->value,
+        'message' => 'Traveler access is working.',
+    ])->name('traveler');
+});
+
+Route::middleware(['auth', 'partner'])->group(function (): void {
+    Route::view('/partner', 'rbac.role-access', [
+        'role' => UserRole::TRAVEL_PARTNER->value,
+        'message' => 'Travel Partner access is working.',
+    ])->name('partner');
+});
+
+Route::middleware(['auth', 'admin'])->group(function (): void {
+    Route::view('/admin', 'rbac.role-access', [
+        'role' => UserRole::ADMIN->value,
+        'message' => 'Admin access is working.',
+    ])->name('admin');
 });
