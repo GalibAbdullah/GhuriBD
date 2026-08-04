@@ -20,6 +20,16 @@
         </div>
 
         <div class="mb-3">
+            <label for="role" class="form-label">Account type</label>
+            <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
+                @foreach ($roles as $role)
+                    <option value="{{ $role->value }}" @selected(old('role', $defaultRole) === $role->value)>{{ $role->value }}</option>
+                @endforeach
+            </select>
+            @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        </div>
+
+        <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input id="password" type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
             @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror

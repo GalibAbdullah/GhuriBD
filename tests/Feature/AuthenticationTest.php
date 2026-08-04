@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Database\Seeders\RoleSeeder;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -22,14 +24,17 @@ class AuthenticationTest extends TestCase
 
     public function test_user_can_register_and_is_authenticated(): void
     {
+        $this->seed(RoleSeeder::class);
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'role' => UserRole::TRAVELER->value,
             'password' => 'Password123!',
             'password_confirmation' => 'Password123!',
         ]);
 
-        $response->assertRedirect('/');
+        $response->assertRedirect('/traveler');
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
@@ -38,9 +43,12 @@ class AuthenticationTest extends TestCase
 
     public function test_user_can_login_and_logout(): void
     {
+        $this->seed(RoleSeeder::class);
+
         $user = User::factory()->create([
             'password' => bcrypt('Password123!'),
         ]);
+        $user->assignRole(UserRole::TRAVELER->value);
 
         $this->post('/login', [
             'email' => $user->email,
@@ -52,7 +60,7 @@ class AuthenticationTest extends TestCase
             'email' => $user->email,
             'password' => 'Password123!',
             'remember' => 'on',
-        ])->assertRedirect('/');
+        ])->assertRedirect('/traveler');
 
         $this->assertAuthenticatedAs($user);
 
