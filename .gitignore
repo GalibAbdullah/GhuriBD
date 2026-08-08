@@ -22,3 +22,10 @@ yarn-error.log*
 pnpm-debug.log*
 coverage
 .DS_Store
+
+# Local database files
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# Local binaries
+/composer.phar

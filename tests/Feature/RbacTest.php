@@ -27,10 +27,10 @@ class RbacTest extends TestCase
         $this->seed(RoleSeeder::class);
         $this->seed(AdminSeeder::class);
 
-        $admin = User::where('email', AdminSeeder::ADMIN_EMAIL)->firstOrFail();
+        $admin = User::where('email', config('ghuribd.admin.email'))->firstOrFail();
 
         $this->assertTrue($admin->hasRole(UserRole::ADMIN->value));
-        $this->assertSame(AdminSeeder::ADMIN_NAME, $admin->name);
+        $this->assertSame(config('ghuribd.admin.name'), $admin->name);
     }
 
     public function test_registration_assigns_traveler_role(): void

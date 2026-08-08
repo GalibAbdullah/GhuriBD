@@ -23,9 +23,9 @@ enum UserRole: string
     public function routeName(): string
     {
         return match ($this) {
-            self::TRAVELER => 'traveler',
-            self::TRAVEL_PARTNER => 'partner',
-            self::ADMIN => 'admin',
+            self::TRAVELER => 'traveler.dashboard',
+            self::TRAVEL_PARTNER => 'partner.dashboard',
+            self::ADMIN => 'admin.dashboard',
         };
     }
 
@@ -33,10 +33,10 @@ enum UserRole: string
     {
         foreach ([self::ADMIN, self::TRAVEL_PARTNER, self::TRAVELER] as $role) {
             if ($user->hasRole($role->value)) {
-                return '/'.$role->routeName();
+                return '/'.collect(explode('.', $role->routeName()))->first();
             }
         }
 
-        return '/'.self::TRAVELER->routeName();
+        return '/'.collect(explode('.', self::TRAVELER->routeName()))->first();
     }
 }

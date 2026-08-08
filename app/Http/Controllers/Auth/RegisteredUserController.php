@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,8 +41,6 @@ class RegisteredUserController extends Controller
 
         Role::findOrCreate($validated['role'], 'web');
         $user->assignRole($validated['role']);
-
-        event(new Registered($user));
 
         Auth::login($user);
 

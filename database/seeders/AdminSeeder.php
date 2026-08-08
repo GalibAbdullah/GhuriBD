@@ -5,25 +5,20 @@ namespace Database\Seeders;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class AdminSeeder extends Seeder
 {
-    public const ADMIN_NAME = 'GhuriBD Admin';
-
-    public const ADMIN_EMAIL = 'admin@ghuribd.test';
-
-    public const ADMIN_PASSWORD = 'Admin123!';
-
     public function run(): void
     {
         Role::findOrCreate(UserRole::ADMIN->value, 'web');
 
         $admin = User::updateOrCreate(
-            ['email' => self::ADMIN_EMAIL],
+            ['email' => config('ghuribd.admin.email')],
             [
-                'name' => self::ADMIN_NAME,
-                'password' => self::ADMIN_PASSWORD,
+                'name' => config('ghuribd.admin.name'),
+                'password' => Hash::make(config('ghuribd.admin.password')),
             ]
         );
 
