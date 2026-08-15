@@ -37,6 +37,7 @@ enum UserRole: string
             }
         }
 
-        return '/'.collect(explode('.', self::TRAVELER->routeName()))->first();
+        // No role assigned — send to profile instead of a 403 on a role-gated dashboard.
+        return '/profile';
     }
 }

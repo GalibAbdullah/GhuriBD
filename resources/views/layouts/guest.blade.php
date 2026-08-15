@@ -12,12 +12,7 @@
     <!-- Public nav -->
     <nav class="sticky top-0 z-30 border-b border-line-soft bg-surface px-7 py-3.5">
         <div class="mx-auto flex max-w-[1180px] items-center justify-between gap-4">
-            <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <span class="grid h-6 w-6 place-items-center text-primary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l7 8-3 11-4-6-4 6-3-11 7-8z"/><path d="M12 2v19"/></svg>
-                </span>
-                <span class="font-display text-[17px] font-bold text-secondary">Ghuri<span class="text-primary">BD</span></span>
-            </a>
+            @include('partials.logo', ['href' => route('home')])
 
             <div class="flex items-center gap-6 text-[14px] font-medium text-ink-muted">
                 <a href="{{ route('home') }}" class="hover:text-primary">Explore</a>
