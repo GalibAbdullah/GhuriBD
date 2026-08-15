@@ -4,11 +4,11 @@
 @section('page-title', $title)
 
 @section('sidebar')
-    <a href="{{ route('traveler.explore') }}" class="nav-item active">Explore</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Resorts</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Tours</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Guides</a>
-    <a href="{{ route('traveler.dashboard') }}" class="nav-item">Back to Dashboard</a>
+    <a href="{{ route('explore') }}" class="nav-item active">Explore</a>
+    <a href="{{ route('explore') }}" class="nav-item">Resorts</a>
+    <a href="{{ route('explore') }}" class="nav-item">Tours</a>
+    <a href="{{ route('explore') }}" class="nav-item">Guides</a>
+    <a href="{{ route('dashboard') }}" class="nav-item">Back to Dashboard</a>
 @endsection
 
 @section('content')
@@ -18,7 +18,7 @@
             <h3>{{ $title }}</h3>
             <p>{{ $message }}</p>
             <div class="mt-4">
-                <a href="{{ route('traveler.dashboard') }}" class="btn btn-primary btn-sm">Back to dashboard</a>
+                <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm">Back to dashboard</a>
             </div>
         </div>
     </div>

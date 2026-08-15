@@ -1,10 +1,14 @@
 <?php
 
+use App\Enums\UserRole;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProviderVerificationController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -35,15 +39,46 @@ Route::middleware(['auth', 'traveler'])->group(function (): void {
 // Travel Partner dashboard
 Route::middleware(['auth', 'partner'])->group(function (): void {
     Route::view('/partner', 'dashboard.partner')->name('partner.dashboard');
+
+    // Provider Verification — Travel Partner can submit and view their status
+    Route::get('/partner/verifications', [ProviderVerificationController::class, 'status'])->name('partner.verifications.status');
+    Route::get('/partner/verifications/create', [ProviderVerificationController::class, 'create'])->name('partner.verifications.create');
+    Route::post('/partner/verifications', [ProviderVerificationController::class, 'store'])->name('partner.verifications.store');
+    Route::get('/partner/verifications/{verification}', [ProviderVerificationController::class, 'show'])->name('partner.verifications.show');
 });
 
 // Admin dashboard
 Route::middleware(['auth', 'admin'])->group(function (): void {
-    Route::view('/admin', 'dashboard.admin')->name('admin.dashboard');
+    Route::get('/admin', AdminDashboardController::class)->name('admin.dashboard');
+
+    // Provider Verification — Admin can view and review all requests
+    Route::get('/admin/verifications', [ProviderVerificationController::class, 'index'])->name('admin.verifications.index');
+    Route::get('/admin/verifications/{verification}', [ProviderVerificationController::class, 'show'])->name('admin.verifications.show');
+    Route::put('/admin/verifications/{verification}', [ProviderVerificationController::class, 'review'])->name('admin.verifications.review');
 });
+
+// User profile management
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+});
+
+// Generic dashboard entry point — redirects each authenticated user to their role dashboard.
+Route::middleware('auth')->get('/dashboard', function () {
+    $user = Auth::user();
+
+    foreach (UserRole::cases() as $role) {
+        if ($user->hasRole($role->value)) {
+            return redirect()->route($role->routeName());
+        }
+    }
+
+    return redirect()->route('profile.show');
+})->name('dashboard');
 
 // Placeholder routes for all prototype features (empty states for now)
 Route::middleware(['auth'])->group(function (): void {
-    Route::view('/profile', 'profile.show')->name('profile.show');
-    Route::get('/explore', fn () => view('empty.feature', ['title' => 'Explore', 'message' => 'Search resorts, tour packages, and guides will live here.']))->name('traveler.explore');
+    Route::get('/explore', fn () => view('empty.feature', ['title' => 'Explore', 'message' => 'Search resorts, tour packages, and guides will live here.']))->name('explore');
 });

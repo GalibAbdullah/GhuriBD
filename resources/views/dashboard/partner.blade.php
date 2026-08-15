@@ -5,13 +5,13 @@
 
 @section('sidebar')
     <a href="{{ route('partner.dashboard') }}" class="nav-item active">Dashboard</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">My Resorts</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Tour Packages</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Guides</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Availability</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Bookings</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Messages</a>
-    <a href="{{ route('traveler.explore') }}" class="nav-item">Verification</a>
+    <a href="{{ route('explore') }}" class="nav-item">My Resorts</a>
+    <a href="{{ route('explore') }}" class="nav-item">Tour Packages</a>
+    <a href="{{ route('explore') }}" class="nav-item">Guides</a>
+    <a href="{{ route('explore') }}" class="nav-item">Availability</a>
+    <a href="{{ route('explore') }}" class="nav-item">Bookings</a>
+    <a href="{{ route('explore') }}" class="nav-item">Messages</a>
+    <a href="{{ route('partner.verifications.status') }}" class="nav-item">Verification</a>
 @endsection
 
 @section('content')
@@ -47,24 +47,24 @@
             <h3 class="text-[16px]">Quick actions</h3>
         </div>
         <div class="grid gap-5 sm:grid-cols-3">
-            <button class="card card-pad text-left" onclick="this.closest('form')?.submit();">
+            <a href="{{ route('explore') }}" class="card card-pad text-left no-underline">
                 <div class="text-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-[18px] w-[18px]"><path d="M3 18v-7a2 2 0 012-2h14a2 2 0 012 2v7"/><path d="M3 18h18"/><path d="M7 11V7a2 2 0 012-2h6a2 2 0 012 2v4"/></svg>
                 </div>
                 <div class="mt-2 text-[13px] font-semibold">Add a resort</div>
-            </button>
-            <button class="card card-pad text-left">
+            </a>
+            <a href="{{ route('explore') }}" class="card card-pad text-left no-underline">
                 <div class="text-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-[18px] w-[18px]"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
                 </div>
                 <div class="mt-2 text-[13px] font-semibold">Create tour package</div>
-            </button>
-            <button class="card card-pad text-left">
+            </a>
+            <a href="{{ route('explore') }}" class="card card-pad text-left no-underline">
                 <div class="text-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-[18px] w-[18px]"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
                 </div>
                 <div class="mt-2 text-[13px] font-semibold">Update availability</div>
-            </button>
+            </a>
         </div>
     </div>
 @endsection

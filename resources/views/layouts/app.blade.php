@@ -13,18 +13,23 @@
         <div class="flex min-h-screen">
             <!-- Sidebar -->
             <aside class="hidden w-[224px] shrink-0 border-r border-line-soft bg-surface p-3 sm:block lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
-                <a href="{{ route('home') }}" class="mb-5 flex items-center gap-2 px-2 py-1">
-                    <span class="grid h-6 w-6 place-items-center text-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l7 8-3 11-4-6-4 6-3-11 7-8z"/><path d="M12 2v19"/></svg>
-                    </span>
-                    <span class="font-display text-[17px] font-bold text-secondary">Ghuri<span class="text-primary">BD</span></span>
-                </a>
+                <div class="mb-5">
+                    @include('partials.logo', ['href' => route('dashboard')])
+                </div>
 
                 <nav class="space-y-0.5">
                     @yield('sidebar')
                 </nav>
 
-                <div class="sidebar-section-label">Account</div>
+                <div class="sidebar-section-label mt-4">Account</div>
+                <a href="{{ route('dashboard') }}" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    Dashboard
+                </a>
+                <a href="{{ route('profile.show') }}" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+                    My Profile
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="nav-item w-full">
@@ -41,10 +46,14 @@
                     <h2 class="text-[19px]">@yield('page-title', config('app.name', 'GhuriBD'))</h2>
                     <div class="flex items-center gap-2.5">
                         @auth
-                            <a href="{{ route('profile.show') }}" class="btn btn-ghost btn-sm">My Profile</a>
-                            <span class="grid h-[34px] w-[34px] place-items-center overflow-hidden rounded-full bg-primary-tint text-xs font-bold text-primary-dark">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                            </span>
+                            <a href="{{ route('dashboard') }}" class="btn btn-ghost btn-sm">My Dashboard</a>
+                            <a href="{{ route('profile.show') }}" class="grid h-[34px] w-[34px] place-items-center overflow-hidden rounded-full border border-line bg-primary-tint text-xs font-bold text-primary-dark">
+                                @if (auth()->user()->profile_photo)
+                                    <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="h-full w-full object-cover">
+                                @else
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                @endif
+                            </a>
                         @endauth
                     </div>
                 </header>
