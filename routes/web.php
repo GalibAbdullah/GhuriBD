@@ -6,7 +6,11 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\GuideAvailabilityController;
+use App\Http\Controllers\GuidePublicController;
+use App\Http\Controllers\PartnerBookingController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +64,9 @@ Route::middleware(['auth', 'partner'])->group(function (): void {
         Route::patch('/partner/availability/{availability}/toggle', [GuideAvailabilityController::class, 'toggle'])->name('partner.availability.toggle');
         Route::delete('/partner/availability/{availability}', [GuideAvailabilityController::class, 'destroy'])->name('partner.availability.destroy');
     });
+
+    // Booking Management — read-only view of who has booked this guide's slots.
+    Route::get('/partner/bookings', [PartnerBookingController::class, 'index'])->name('partner.bookings.index');
 });
 
 // Admin dashboard
@@ -92,6 +99,29 @@ Route::middleware('auth')->get('/dashboard', function () {
 
     return redirect()->route('profile.show');
 })->name('dashboard');
+
+// Guide public profile — minimal entry point into booking a guide, ahead of
+// the full search/marketplace experience.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/guides/{guide}', [GuidePublicController::class, 'show'])->name('guides.show');
+});
+
+// Booking Management & Secure Online Payment
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/availability/{availability}/book', [BookingController::class, 'create'])->name('bookings.create');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{booking}/checkout', [BookingController::class, 'checkout'])->name('bookings.checkout');
+
+    Route::middleware('throttle:30,1')->group(function (): void {
+        Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+
+        // Mock payment gateway — stands in for a real provider's redirect/webhook.
+        Route::get('/payments/mock/{payment}', [PaymentController::class, 'mockShow'])->name('payments.mock.show');
+        Route::post('/payments/mock/{payment}/callback', [PaymentController::class, 'mockCallback'])->name('payments.mock.callback');
+    });
+});
 
 // Placeholder routes for all prototype features (empty states for now)
 Route::middleware(['auth'])->group(function (): void {

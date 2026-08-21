@@ -9,7 +9,7 @@
     <a href="{{ route('explore') }}" class="nav-item">Tour Packages</a>
     <a href="{{ route('explore') }}" class="nav-item">Guides</a>
     <a href="{{ route('partner.availability.index') }}" class="nav-item">Availability</a>
-    <a href="{{ route('explore') }}" class="nav-item">Bookings</a>
+    <a href="{{ route('partner.bookings.index') }}" class="nav-item">Bookings</a>
     <a href="{{ route('explore') }}" class="nav-item">Messages</a>
     <a href="{{ route('partner.verifications.status') }}" class="nav-item">Verification</a>
 @endsection

@@ -63,4 +63,37 @@ return [
         'max_bulk_range_days' => 90,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Booking Rules
+    |--------------------------------------------------------------------------
+    */
+
+    'booking' => [
+        // Travelers per booking (a solo traveler or their whole party).
+        'min_party_size' => 1,
+        'max_party_size' => 20,
+
+        // A confirmed booking can only be cancelled this many hours before the
+        // slot starts — a guide who shows up to an empty tour an hour before
+        // start time cannot recover that lost morning.
+        'cancellation_window_hours' => 24,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment
+    |--------------------------------------------------------------------------
+    |
+    | "mock" simulates a gateway in-app (approve/decline) with no external
+    | credentials, so the booking-and-payment flow is fully testable before a
+    | real provider (e.g. SSLCommerz) is wired in. Swapping providers later is
+    | one binding change in AppServiceProvider, not a rewrite of this config.
+    |
+    */
+
+    'payment' => [
+        'gateway' => env('PAYMENT_GATEWAY', 'mock'),
+    ],
+
 ];

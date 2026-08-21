@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AvailabilityStatus;
+use App\Enums\BookingStatus;
 use Carbon\CarbonInterface;
 use Database\Factories\GuideAvailabilityFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 class GuideAvailability extends Model
@@ -123,9 +125,31 @@ class GuideAvailability extends Model
         );
     }
 
+    protected static function booted(): void
+    {
+        // Deletion is only permitted while booked_count is 0 (see
+        // GuideAvailabilityPolicy), but an unpaid pending booking carries no
+        // capacity yet and would otherwise dangle once its bookable is gone.
+        static::deleting(function (self $availability): void {
+            $availability->bookings()
+                ->where('status', BookingStatus::PENDING_PAYMENT->value)
+                ->get()
+                ->each(fn (Booking $booking) => $booking->update([
+                    'status' => BookingStatus::CANCELLED->value,
+                    'cancellation_reason' => 'The guide removed this availability slot.',
+                    'cancelled_at' => now(),
+                ]));
+        });
+    }
+
     public function guide(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function bookings(): MorphMany
+    {
+        return $this->morphMany(Booking::class, 'bookable');
     }
 
     public function startsAt(): CarbonInterface
@@ -220,6 +244,18 @@ class GuideAvailability extends Model
     public function scopeWithStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * A coarse, query-level version of isBookable() for listing pages (date and
+     * capacity are cheap to filter in SQL; the precise "has today's slot
+     * already started" check still runs per-row via isBookable()/hasEnded()).
+     */
+    public function scopeBookable(Builder $query): Builder
+    {
+        return $query->upcoming()
+            ->withStatus(AvailabilityStatus::AVAILABLE->value)
+            ->whereColumn('booked_count', '<', 'capacity');
     }
 
     public function scopeInMonth(Builder $query, int $year, int $month): Builder
