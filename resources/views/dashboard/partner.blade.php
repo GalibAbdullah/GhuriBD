@@ -8,7 +8,7 @@
     <a href="{{ route('explore') }}" class="nav-item">My Resorts</a>
     <a href="{{ route('explore') }}" class="nav-item">Tour Packages</a>
     <a href="{{ route('explore') }}" class="nav-item">Guides</a>
-    <a href="{{ route('explore') }}" class="nav-item">Availability</a>
+    <a href="{{ route('partner.availability.index') }}" class="nav-item">Availability</a>
     <a href="{{ route('explore') }}" class="nav-item">Bookings</a>
     <a href="{{ route('explore') }}" class="nav-item">Messages</a>
     <a href="{{ route('partner.verifications.status') }}" class="nav-item">Verification</a>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="mt-2 text-[13px] font-semibold">Create tour package</div>
             </a>
-            <a href="{{ route('explore') }}" class="card card-pad text-left no-underline">
+            <a href="{{ route('partner.availability.index') }}" class="card card-pad text-left no-underline">
                 <div class="text-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-[18px] w-[18px]"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
                 </div>
