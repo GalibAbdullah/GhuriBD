@@ -10,7 +10,7 @@
 @section('content')
     <div class="mx-auto max-w-[480px]">
         <div class="card card-pad text-center">
-            <div class="mb-1 text-[12.5px] font-semibold uppercase tracking-wide text-ink-faint">Mock Gateway — Sandbox</div>
+            <div class="mb-2 text-[12.5px] font-semibold tracking-wide text-ink-faint">MOCK GATEWAY — SANDBOX</div>
             <h3 class="mb-5 text-[16px] font-semibold">Complete Payment</h3>
 
             <div class="kv-row">

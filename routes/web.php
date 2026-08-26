@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\AdminAnalyticsController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\PartnerBookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
+use App\Http\Controllers\TourPlanController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -77,6 +79,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
     Route::get('/admin/verifications', [ProviderVerificationController::class, 'index'])->name('admin.verifications.index');
     Route::get('/admin/verifications/{verification}', [ProviderVerificationController::class, 'show'])->name('admin.verifications.show');
     Route::put('/admin/verifications/{verification}', [ProviderVerificationController::class, 'review'])->name('admin.verifications.review');
+
+    // Admin Dashboard & Analytics
+    Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
 });
 
 // User profile management
@@ -120,6 +125,19 @@ Route::middleware(['auth'])->group(function (): void {
         // Mock payment gateway — stands in for a real provider's redirect/webhook.
         Route::get('/payments/mock/{payment}', [PaymentController::class, 'mockShow'])->name('payments.mock.show');
         Route::post('/payments/mock/{payment}/callback', [PaymentController::class, 'mockCallback'])->name('payments.mock.callback');
+    });
+});
+
+// AI Tour Planner
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/tour-plans', [TourPlanController::class, 'index'])->name('tour-plans.index');
+    Route::get('/tour-plans/create', [TourPlanController::class, 'create'])->name('tour-plans.create');
+    Route::get('/tour-plans/{plan}', [TourPlanController::class, 'show'])->name('tour-plans.show');
+
+    Route::middleware('throttle:20,1')->group(function (): void {
+        Route::post('/tour-plans', [TourPlanController::class, 'store'])->name('tour-plans.store');
+        Route::post('/tour-plans/{plan}/regenerate', [TourPlanController::class, 'regenerate'])->name('tour-plans.regenerate');
+        Route::delete('/tour-plans/{plan}', [TourPlanController::class, 'destroy'])->name('tour-plans.destroy');
     });
 });
 

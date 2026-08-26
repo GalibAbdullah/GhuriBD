@@ -16,7 +16,7 @@
 
 @section('content')
     <div class="mb-5 flex items-center gap-3">
-        <div class="grid h-12 w-12 place-items-center overflow-hidden rounded-full border border-line bg-primary-tint text-base font-bold text-primary-dark">
+        <div class="grid h-[48px] w-[48px] place-items-center overflow-hidden rounded-full border border-line bg-primary-tint text-[16px] font-bold text-primary-dark">
             {{ strtoupper(substr($guide->name, 0, 1)) }}
         </div>
         <div>

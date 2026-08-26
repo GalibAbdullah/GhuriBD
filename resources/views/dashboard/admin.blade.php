@@ -36,7 +36,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg>
         Complaints
     </a>
-    <a href="{{ route('explore') }}" class="nav-item">
+    <a href="{{ route('admin.analytics.index') }}" class="nav-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>
         Analytics
     </a>
@@ -49,8 +49,8 @@
 
     <!-- Stats -->
     <div class="mb-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="stat-card"><div class="stat-label">Total bookings (Aug)</div><div class="stat-value">0</div></div>
-        <div class="stat-card"><div class="stat-label">Platform revenue</div><div class="stat-value font-mono">৳0</div></div>
+        <div class="stat-card"><div class="stat-label">Bookings ({{ $currentMonthLabel }})</div><div class="stat-value">{{ $bookingsThisMonth }}</div></div>
+        <div class="stat-card"><div class="stat-label">Revenue ({{ $currentMonthLabel }})</div><div class="stat-value font-mono">৳{{ number_format((float) $revenueThisMonth, 2) }}</div></div>
         <div class="stat-card"><div class="stat-label">Pending verifications</div><div class="stat-value">{{ $pendingCount }}</div></div>
         <div class="stat-card"><div class="stat-label">Open complaints</div><div class="stat-value">0</div></div>
     </div>
