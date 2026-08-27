@@ -45,9 +45,9 @@ enum AvailabilityStatus: string
     public function badgeClass(): string
     {
         return match ($this) {
-            self::AVAILABLE => 'badge badge-success',
-            self::BLOCKED => 'badge badge-neutral',
-            self::BOOKED => 'badge badge-info',
+            self::AVAILABLE => 'badge text-bg-success',
+            self::BLOCKED => 'badge text-bg-secondary',
+            self::BOOKED => 'badge text-bg-info',
         };
     }
 }

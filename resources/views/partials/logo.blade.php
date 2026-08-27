@@ -1,7 +1,7 @@
-<a href="{{ $href ?? route('home') }}" class="group flex items-center gap-2 px-2 py-1" aria-label="GhuriBD home">
-    <span class="logo-3d relative grid h-9 w-9 place-items-center">
+<a href="{{ $href ?? route('home') }}" class="d-flex align-items-center gap-2 px-2 py-1 text-decoration-none" aria-label="GhuriBD home">
+    <span class="logo-3d position-relative d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
         {{-- Kite flying along a curved path --}}
-        <svg viewBox="0 0 40 40" fill="none" class="logo-kite absolute inset-0 h-full w-full" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none" class="logo-kite position-absolute top-0 start-0 w-100 h-100" aria-hidden="true">
             <defs>
                 <linearGradient id="kiteGrad" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stop-color="#22c55e"/>
@@ -36,7 +36,7 @@
             </g>
         </svg>
         {{-- Kite soft shadow --}}
-        <span class="logo-kite-shadow absolute -bottom-1 left-1/2 h-1.5 w-6 -translate-x-1/2 rounded-full bg-black/25 blur-[2px]"></span>
+        <span class="logo-kite-shadow position-absolute top-100 start-50 translate-middle rounded-pill bg-black bg-opacity-25" style="width: 24px; height: 6px; margin-top: -4px; filter: blur(2px);"></span>
     </span>
-    <span class="font-display text-[17px] font-bold text-secondary">Ghuri<span class="text-primary">BD</span></span>
+    <span class="fw-bold text-dark" style="font-size: 17px;">Ghuri<span class="text-primary">BD</span></span>
 </a>

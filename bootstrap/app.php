@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Middleware\AdminMiddleware;
-use App\Http\Middleware\TravelPartnerMiddleware;
 use App\Http\Middleware\TravelerMiddleware;
+use App\Http\Middleware\TravelPartnerMiddleware;
+use App\Http\Middleware\VerifiedPartnerMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -31,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'traveler' => TravelerMiddleware::class,
             'partner' => TravelPartnerMiddleware::class,
             'admin' => AdminMiddleware::class,
+            'verified.partner' => VerifiedPartnerMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

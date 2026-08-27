@@ -6,30 +6,30 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'GhuriBD')) — {{ config('app.name', 'GhuriBD') }}</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-bg text-ink">
+<body class="min-vh-100">
     <!-- Public nav -->
-    <nav class="sticky top-0 z-30 border-b border-line-soft bg-surface px-7 py-3.5">
-        <div class="mx-auto flex max-w-[1180px] items-center justify-between gap-4">
+    <nav class="sticky-top border-bottom bg-white px-3 px-md-4 py-3" style="z-index: 1020;">
+        <div class="mx-auto d-flex align-items-center justify-content-between gap-3" style="max-width: 1180px;">
             @include('partials.logo', ['href' => route('home')])
 
-            <div class="flex items-center gap-6 text-[14px] font-medium text-ink-muted">
-                <a href="{{ route('home') }}" class="hover:text-primary">Explore</a>
-                <a href="{{ route('home') }}" class="hover:text-primary">Guides</a>
-                <a href="{{ route('home') }}" class="hover:text-primary">AI Planner</a>
+            <div class="d-flex align-items-center gap-4 small fw-medium text-secondary">
+                <a href="{{ route('home') }}" class="link-secondary link-underline-opacity-0 link-underline-opacity-100-hover">Explore</a>
+                <a href="{{ route('home') }}" class="link-secondary link-underline-opacity-0 link-underline-opacity-100-hover">Guides</a>
+                <a href="{{ route('home') }}" class="link-secondary link-underline-opacity-0 link-underline-opacity-100-hover">AI Planner</a>
             </div>
 
-            <div class="flex items-center gap-2">
-                <a href="{{ route('login') }}" class="btn btn-outline btn-sm">Log in</a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('login') }}" class="btn btn-outline-secondary btn-sm">Log in</a>
                 <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Sign up</a>
             </div>
         </div>
     </nav>
 
-    <main class="mx-auto max-w-[1180px] px-4 py-8">
+    <main class="mx-auto px-3 py-5" style="max-width: 1180px;">
         @if (session('status'))
-            <div class="mx-auto mb-6 max-w-lg rounded-lg border border-success-tint bg-success-tint px-4 py-3 text-[13px] font-medium text-success" role="alert">
+            <div class="mx-auto mb-4 alert alert-success" style="max-width: 32rem;" role="alert">
                 {{ session('status') }}
             </div>
         @endif
