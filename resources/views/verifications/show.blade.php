@@ -5,145 +5,155 @@
 
 @section('sidebar')
     @if (auth()->user()->hasRole('Admin'))
-        <a href="{{ route('admin.dashboard') }}" class="nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
             Dashboard
         </a>
-        <a href="{{ route('admin.verifications.index') }}" class="nav-item active">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path d="M12 3l8 3v6c0 4.5-3.4 7.9-8 9-4.6-1.1-8-4.5-8-9V6l8-3z"/></svg>
+        <a href="{{ route('admin.verifications.index') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded active bg-primary-subtle text-primary-emphasis fw-semibold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M12 3l8 3v6c0 4.5-3.4 7.9-8 9-4.6-1.1-8-4.5-8-9V6l8-3z"/></svg>
             Verification
         </a>
     @else
-        <a href="{{ route('partner.dashboard') }}" class="nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <a href="{{ route('partner.dashboard') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
             Dashboard
         </a>
-        <a href="{{ route('profile.show') }}" class="nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+        <a href="{{ route('profile.show') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
             My Profile
         </a>
-        <a href="{{ route('partner.verifications.status') }}" class="nav-item active">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path d="M12 3l8 3v6c0 4.5-3.4 7.9-8 9-4.6-1.1-8-4.5-8-9V6l8-3z"/></svg>
+        <a href="{{ route('partner.verifications.status') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded active bg-primary-subtle text-primary-emphasis fw-semibold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M12 3l8 3v6c0 4.5-3.4 7.9-8 9-4.6-1.1-8-4.5-8-9V6l8-3z"/></svg>
             Verification
         </a>
     @endif
 @endsection
 
 @section('content')
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div class="breadcrumb">
-            @if (auth()->user()->hasRole('Admin'))
-                <a href="{{ route('admin.verifications.index') }}">Verification queue</a>
-                <span class="mx-1 text-ink-faint">/</span>
-            @else
-                <a href="{{ route('partner.verifications.status') }}">Verification status</a>
-                <span class="mx-1 text-ink-faint">/</span>
-            @endif
-            <span>Details</span>
-        </div>
+    <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                @if (auth()->user()->hasRole('Admin'))
+                    <li class="breadcrumb-item"><a href="{{ route('admin.verifications.index') }}" class="link-secondary link-underline-opacity-0">Verification queue</a></li>
+                @else
+                    <li class="breadcrumb-item"><a href="{{ route('partner.verifications.status') }}" class="link-secondary link-underline-opacity-0">Verification status</a></li>
+                @endif
+                <li class="breadcrumb-item active text-secondary" aria-current="page">Details</li>
+            </ol>
+        </nav>
 
         @if ($verification->isApproved())
-            <span class="badge badge-success">Approved</span>
+            <span class="badge text-bg-success">Approved</span>
         @elseif ($verification->isRejected())
-            <span class="badge badge-error">Rejected</span>
+            <span class="badge text-bg-danger">Rejected</span>
         @else
-            <span class="badge badge-warning">Pending</span>
+            <span class="badge text-bg-warning">Pending</span>
         @endif
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        <div class="lg:col-span-2">
-            <div class="card card-pad">
-                <h3 class="mb-4 text-[16px] font-semibold">{{ $verification->provider_name }}</h3>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="mb-4 h6 fw-semibold">{{ $verification->provider_name }}</h3>
 
-                <div class="max-w-[560px]">
-                    <div class="kv-row">
-                        <span class="kv-label">Provider type</span>
-                        <span class="text-ink font-semibold">{{ $verification->provider_type }}</span>
-                    </div>
-                    <div class="kv-row">
-                        <span class="kv-label">Business address</span>
-                        <span class="text-right text-ink">{{ $verification->business_address }}</span>
-                    </div>
-                    <div class="kv-row">
-                        <span class="kv-label">Phone</span>
-                        <span class="kv-value">{{ $verification->phone }}</span>
-                    </div>
-                    <div class="kv-row">
-                        <span class="kv-label">Submitted by</span>
-                        <span class="text-ink font-semibold">{{ $verification->user->name }} ({{ $verification->user->email }})</span>
-                    </div>
-                    <div class="kv-row">
-                        <span class="kv-label">Submitted at</span>
-                        <span class="text-ink">{{ $verification->created_at->format('M d, Y h:i A') }}</span>
-                    </div>
-                </div>
-
-                @if ($verification->additional_information)
-                    <div class="mt-4">
-                        <div class="input-label">Additional information</div>
-                        <div class="rounded-lg border border-line-soft bg-bg px-4 py-3 text-[13px] text-ink">
-                            {{ $verification->additional_information }}
+                    <div style="max-width: 560px;">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span class="text-secondary">Provider type</span>
+                                <span class="text-body fw-semibold">{{ $verification->provider_type }}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span class="text-secondary">Business address</span>
+                                <span class="text-end text-body">{{ $verification->business_address }}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span class="text-secondary">Phone</span>
+                                <span class="font-monospace fw-semibold">{{ $verification->phone }}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span class="text-secondary">Submitted by</span>
+                                <span class="text-body fw-semibold">{{ $verification->user->name }} ({{ $verification->user->email }})</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span class="text-secondary">Submitted at</span>
+                                <span class="text-body">{{ $verification->created_at->format('M d, Y h:i A') }}</span>
+                            </div>
                         </div>
                     </div>
-                @endif
 
-                <div class="mt-5">
-                    <a href="{{ $verification->verification_document_url }}" target="_blank" class="btn btn-outline btn-sm">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6z"/><path d="M14 3v6h6M9 13h6M9 17h6"/></svg>
-                        View verification document
-                    </a>
-                </div>
+                    @if ($verification->additional_information)
+                        <div class="mt-3">
+                            <div class="form-label mb-1">Additional information</div>
+                            <div class="rounded-3 border bg-body-tertiary px-3 py-2 small text-body">
+                                {{ $verification->additional_information }}
+                            </div>
+                        </div>
+                    @endif
 
-                @if ($verification->isRejected() && $verification->rejection_reason)
-                    <div class="mt-5 rounded-lg border border-error-tint bg-error-tint px-4 py-3 text-[13px] text-error">
-                        <strong>Rejection reason:</strong> {{ $verification->rejection_reason }}
+                    <div class="mt-4">
+                        <a href="{{ $verification->verification_document_url }}" target="_blank" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6z"/><path d="M14 3v6h6M9 13h6M9 17h6"/></svg>
+                            View verification document
+                        </a>
                     </div>
-                @endif
+
+                    @if ($verification->isRejected() && $verification->rejection_reason)
+                        <div class="mt-4 alert alert-danger mb-0">
+                            <strong>Rejection reason:</strong> {{ $verification->rejection_reason }}
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 
-        <div>
+        <div class="col-lg-4">
             @if (auth()->user()->hasRole('Admin') && $verification->isPending())
-                <div class="card card-pad">
-                    <h3 class="mb-4 text-[16px] font-semibold">Review decision</h3>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="mb-4 h6 fw-semibold">Review decision</h3>
 
-                    <form method="POST" action="{{ route('admin.verifications.review', $verification) }}">
-                        @csrf
-                        @method('PUT')
+                        <form method="POST" action="{{ route('admin.verifications.review', $verification) }}">
+                            @csrf
+                            @method('PUT')
 
-                        <div class="mb-4">
-                            <label class="input-label">Decision</label>
-                            <label class="mb-2 flex cursor-pointer items-center gap-2.5 text-[13px] font-medium">
-                                <input type="radio" name="status" value="Approved" class="accent-primary" required>
-                                Approve — mark partner as verified
-                            </label>
-                            <label class="flex cursor-pointer items-center gap-2.5 text-[13px] font-medium">
-                                <input type="radio" name="status" value="Rejected" class="accent-error" required>
-                                Reject
-                            </label>
-                            @error('status')<p class="mt-1 text-[11.5px] font-medium text-error">{{ $message }}</p>@enderror
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label">Decision</label>
+                                <div class="form-check mb-2">
+                                    <input type="radio" name="status" value="Approved" id="status_approved" class="form-check-input" required>
+                                    <label for="status_approved" class="form-check-label small">Approve — mark partner as verified</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" name="status" value="Rejected" id="status_rejected" class="form-check-input" required>
+                                    <label for="status_rejected" class="form-check-label small">Reject</label>
+                                </div>
+                                @error('status')<div class="text-danger small fw-medium mt-1">{{ $message }}</div>@enderror
+                            </div>
 
-                        <div class="input-group">
-                            <label for="rejection_reason" class="input-label">Rejection reason <span class="text-ink-faint font-normal">(required when rejecting)</span></label>
-                            <textarea id="rejection_reason" name="rejection_reason" rows="4" class="input @error('rejection_reason') !border-error @enderror" placeholder="Explain why the request is being rejected">{{ old('rejection_reason') }}</textarea>
-                            @error('rejection_reason')<p class="mt-1 text-[11.5px] font-medium text-error">{{ $message }}</p>@enderror
-                        </div>
+                            <div class="mb-3">
+                                <label for="rejection_reason" class="form-label">Rejection reason <span class="text-body-tertiary fw-normal">(required when rejecting)</span></label>
+                                <textarea id="rejection_reason" name="rejection_reason" rows="4" class="form-control @error('rejection_reason') is-invalid @enderror" placeholder="Explain why the request is being rejected">{{ old('rejection_reason') }}</textarea>
+                                @error('rejection_reason')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
 
-                        <button type="submit" class="btn btn-primary btn-block">Submit decision</button>
-                    </form>
+                            <button type="submit" class="btn btn-primary w-100">Submit decision</button>
+                        </form>
+                    </div>
                 </div>
             @elseif ($verification->reviewed_at && $verification->reviewer)
-                <div class="card card-pad">
-                    <h3 class="mb-4 text-[16px] font-semibold">Review info</h3>
-                    <div class="kv-row">
-                        <span class="kv-label">Reviewed by</span>
-                        <span class="text-ink font-semibold">{{ $verification->reviewer->name }}</span>
-                    </div>
-                    <div class="kv-row">
-                        <span class="kv-label">Reviewed at</span>
-                        <span class="text-ink">{{ $verification->reviewed_at->format('M d, Y h:i A') }}</span>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="mb-4 h6 fw-semibold">Review info</h3>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span class="text-secondary">Reviewed by</span>
+                                <span class="text-body fw-semibold">{{ $verification->reviewer->name }}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span class="text-secondary">Reviewed at</span>
+                                <span class="text-body">{{ $verification->reviewed_at->format('M d, Y h:i A') }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif

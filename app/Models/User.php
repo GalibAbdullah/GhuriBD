@@ -59,4 +59,12 @@ class User extends Authenticatable
             ->where('status', VerificationStatus::APPROVED->value)
             ->exists();
     }
+
+    /**
+     * All resort listings owned by this Travel Partner.
+     */
+    public function resorts(): HasMany
+    {
+        return $this->hasMany(Resort::class);
+    }
 }

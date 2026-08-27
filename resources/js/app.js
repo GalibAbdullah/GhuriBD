@@ -1,3 +1,5 @@
+import 'bootstrap';
+
 // GhuriBD — hero drone-video slideshow
 //
 // Cycles through the background videos on the welcome page, crossfading

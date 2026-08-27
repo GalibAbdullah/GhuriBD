@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
+use App\Http\Controllers\ResortController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,11 @@ Route::middleware(['auth', 'partner'])->group(function (): void {
     Route::get('/partner/verifications/create', [ProviderVerificationController::class, 'create'])->name('partner.verifications.create');
     Route::post('/partner/verifications', [ProviderVerificationController::class, 'store'])->name('partner.verifications.store');
     Route::get('/partner/verifications/{verification}', [ProviderVerificationController::class, 'show'])->name('partner.verifications.show');
+
+    // Resort Management — Travel Partner must additionally be an approved provider
+    Route::middleware('verified.partner')->group(function (): void {
+        Route::resource('partner/resorts', ResortController::class)->names('partner.resorts');
+    });
 });
 
 // Admin dashboard
@@ -55,6 +61,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
     Route::get('/admin/verifications', [ProviderVerificationController::class, 'index'])->name('admin.verifications.index');
     Route::get('/admin/verifications/{verification}', [ProviderVerificationController::class, 'show'])->name('admin.verifications.show');
     Route::put('/admin/verifications/{verification}', [ProviderVerificationController::class, 'review'])->name('admin.verifications.review');
+
+    // Resort Management — Admin has read-only access
+    Route::resource('admin/resorts', ResortController::class)->only(['index', 'show'])->names('admin.resorts');
 });
 
 // User profile management
