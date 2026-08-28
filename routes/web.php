@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
 use App\Http\Controllers\ResortController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,10 @@ Route::middleware('auth')->group(function (): void {
 // Traveler dashboard
 Route::middleware(['auth', 'traveler'])->group(function (): void {
     Route::view('/traveler', 'dashboard.traveler')->name('traveler.dashboard');
+
+    // Browse resorts & rooms — read-only, active listings only
+    Route::resource('traveler/resorts', ResortController::class)->only(['index', 'show'])->names('traveler.resorts');
+    Route::resource('traveler/resorts.rooms', RoomController::class)->only(['index', 'show'])->names('traveler.resorts.rooms');
 });
 
 // Travel Partner dashboard
@@ -50,6 +55,9 @@ Route::middleware(['auth', 'partner'])->group(function (): void {
     // Resort Management — Travel Partner must additionally be an approved provider
     Route::middleware('verified.partner')->group(function (): void {
         Route::resource('partner/resorts', ResortController::class)->names('partner.resorts');
+
+        // Room Management — rooms are nested under the resort they belong to
+        Route::resource('partner/resorts.rooms', RoomController::class)->names('partner.resorts.rooms');
     });
 });
 
@@ -64,6 +72,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
 
     // Resort Management — Admin has read-only access
     Route::resource('admin/resorts', ResortController::class)->only(['index', 'show'])->names('admin.resorts');
+
+    // Room Management — Admin has read-only access
+    Route::resource('admin/resorts.rooms', RoomController::class)->only(['index', 'show'])->names('admin.resorts.rooms');
 });
 
 // User profile management

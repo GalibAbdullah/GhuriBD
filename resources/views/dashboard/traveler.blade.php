@@ -14,7 +14,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2z"/></svg>
         Explore
     </a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+    <a href="{{ route('traveler.resorts.index') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M3 18v-7a2 2 0 012-2h14a2 2 0 012 2v7"/><path d="M3 18h18"/><path d="M7 11V7a2 2 0 012-2h6a2 2 0 012 2v4"/></svg>
         Resorts
     </a>
@@ -90,7 +90,7 @@
                     <h3>Discover resorts &amp; tours</h3>
                     <p>Personalized recommendations will appear as you explore the platform.</p>
                     <div class="mt-3">
-                        <a href="{{ route('explore') }}" class="btn btn-outline-secondary btn-sm">Explore Bangladesh</a>
+                        <a href="{{ route('traveler.resorts.index') }}" class="btn btn-outline-secondary btn-sm">Browse Resorts</a>
                     </div>
                 </div>
             </div>

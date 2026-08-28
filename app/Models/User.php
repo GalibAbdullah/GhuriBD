@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\VerificationStatus;
+use App\Support\StorageImage;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -36,9 +37,7 @@ class User extends Authenticatable
     protected function profilePhotoUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->profile_photo
-                ? asset('storage/'.ltrim($this->profile_photo, '/'))
-                : asset('images/default-avatar.svg'),
+            get: fn () => StorageImage::url($this->profile_photo, 'images/default-avatar.svg'),
         );
     }
 

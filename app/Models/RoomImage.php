@@ -3,29 +3,29 @@
 namespace App\Models;
 
 use App\Support\StorageImage;
-use Database\Factories\ResortImageFactory;
+use Database\Factories\RoomImageFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
-class ResortImage extends Model
+class RoomImage extends Model
 {
-    /** @use HasFactory<ResortImageFactory> */
+    /** @use HasFactory<RoomImageFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'resort_id',
+        'room_id',
         'image_path',
     ];
 
     /**
-     * The resort this gallery image belongs to.
+     * The room this gallery image belongs to.
      */
-    public function resort(): BelongsTo
+    public function room(): BelongsTo
     {
-        return $this->belongsTo(Resort::class);
+        return $this->belongsTo(Room::class);
     }
 
     /**
@@ -43,7 +43,7 @@ class ResortImage extends Model
      */
     protected static function booted(): void
     {
-        static::deleting(function (ResortImage $image): void {
+        static::deleting(function (RoomImage $image): void {
             Storage::disk('public')->delete($image->image_path);
         });
     }
