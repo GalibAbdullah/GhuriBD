@@ -8,7 +8,7 @@
     <a href="{{ route('partner.resorts.index') }}" class="list-group-item list-group-item-action border-0 rounded">My Resorts</a>
     <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Tour Packages</a>
     <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Guides</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Availability</a>
+    <a href="{{ route('partner.availability.index') }}" class="list-group-item list-group-item-action border-0 rounded">Availability</a>
     <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Bookings</a>
     <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Messages</a>
     <a href="{{ route('partner.verifications.status') }}" class="list-group-item list-group-item-action border-0 rounded">Verification</a>
@@ -66,7 +66,7 @@
                 </a>
             </div>
             <div class="col">
-                <a href="{{ route('explore') }}" class="card card-body text-decoration-none h-100">
+                <a href="{{ route('partner.availability.index') }}" class="card card-body text-decoration-none h-100">
                     <div class="text-primary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
                     </div>
