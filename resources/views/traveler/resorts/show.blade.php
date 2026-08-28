@@ -4,13 +4,13 @@
 @section('page-title', $resort->name)
 
 @section('sidebar')
-    @include('resorts.partials.sidebar')
+    @include('traveler.partials.sidebar')
 @endsection
 
 @section('content')
     <div class="mb-3">
-        <a href="{{ route($isAdmin ? 'admin.resorts.index' : 'partner.resorts.index') }}" class="small fw-semibold link-secondary link-underline-opacity-0">
-            &larr; Back to {{ $isAdmin ? 'All Resorts' : 'My Resorts' }}
+        <a href="{{ route('traveler.resorts.index') }}" class="small fw-semibold link-secondary link-underline-opacity-0">
+            &larr; Back to Resorts
         </a>
     </div>
 
@@ -24,26 +24,8 @@
             <h3 class="h4 mb-1">{{ $resort->name }}</h3>
             <div class="small text-secondary">{{ $resort->district }}, {{ $resort->division }}</div>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            @if ($resort->isActive())
-                <span class="badge text-bg-success">Active</span>
-            @else
-                <span class="badge text-bg-secondary">Inactive</span>
-            @endif
-            <span class="badge text-bg-light border">{{ $resort->rooms_count }} {{ Str::plural('Room', $resort->rooms_count) }}</span>
-
-            <a href="{{ route($isAdmin ? 'admin.resorts.rooms.index' : 'partner.resorts.rooms.index', $resort) }}" class="btn btn-outline-primary btn-sm">Manage Rooms</a>
-            @unless ($isAdmin)
-                <a href="{{ route('partner.resorts.edit', $resort) }}" class="btn btn-outline-secondary btn-sm">Edit Resort</a>
-            @endunless
-        </div>
+        <a href="{{ route('traveler.resorts.rooms.index', $resort) }}" class="btn btn-primary btn-sm">View Rooms ({{ $resort->rooms_count }})</a>
     </div>
-
-    @if ($isAdmin)
-        <div class="alert alert-secondary small mb-4">
-            Listed by <strong>{{ $resort->user->name }}</strong> ({{ $resort->user->email }})
-        </div>
-    @endif
 
     <div class="row g-4">
         <div class="col-lg-8">

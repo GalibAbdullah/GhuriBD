@@ -17,7 +17,8 @@ use Illuminate\View\View;
 class ResortController extends Controller
 {
     /**
-     * List resorts. Travel Partners see only their own; Admins see everyone's.
+     * List resorts. Travel Partners see only their own; Admins see everyone's;
+     * Travelers browse the public, active-only listing.
      */
     public function index(Request $request): View
     {
@@ -25,9 +26,17 @@ class ResortController extends Controller
 
         $user = $request->user();
         $isAdmin = $user->hasRole(UserRole::ADMIN->value);
+        $isTraveler = $user->hasRole(UserRole::TRAVELER->value);
         $search = $request->string('search')->trim()->value();
 
-        $resorts = ($isAdmin ? Resort::query()->with('user') : $user->resorts())
+        $query = match (true) {
+            $isAdmin => Resort::query()->with('user'),
+            $isTraveler => Resort::query()->where('status', ResortStatus::ACTIVE->value),
+            default => $user->resorts(),
+        };
+
+        $resorts = $query
+            ->withCount('rooms')
             ->when($search, fn ($query) => $query->where(function ($query) use ($search): void {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('district', 'like', "%{$search}%")
@@ -36,6 +45,13 @@ class ResortController extends Controller
             ->latest()
             ->paginate(12)
             ->withQueryString();
+
+        if ($isTraveler) {
+            return view('traveler.resorts.index', [
+                'resorts' => $resorts,
+                'search' => $search,
+            ]);
+        }
 
         $countQuery = fn () => $isAdmin ? Resort::query() : $user->resorts();
 
@@ -96,8 +112,14 @@ class ResortController extends Controller
     {
         Gate::authorize('view', $resort);
 
+        $resort = $resort->load(['user', 'images'])->loadCount('rooms');
+
+        if ($request->user()->hasRole(UserRole::TRAVELER->value)) {
+            return view('traveler.resorts.show', ['resort' => $resort]);
+        }
+
         return view('resorts.show', [
-            'resort' => $resort->load(['user', 'images']),
+            'resort' => $resort,
             'isAdmin' => $request->user()->hasRole(UserRole::ADMIN->value),
         ]);
     }

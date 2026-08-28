@@ -70,6 +70,7 @@
                             <th>Division</th>
                             <th>Price Range</th>
                             <th>Status</th>
+                            <th>Rooms</th>
                             <th>Created</th>
                             <th></th>
                         </tr>
@@ -94,9 +95,11 @@
                                         <span class="badge text-bg-secondary">Inactive</span>
                                     @endif
                                 </td>
+                                <td><span class="badge text-bg-light border">{{ $resort->rooms_count }}</span></td>
                                 <td>{{ $resort->created_at->format('M d, Y') }}</td>
                                 <td class="text-end text-nowrap">
                                     <a href="{{ route($isAdmin ? 'admin.resorts.show' : 'partner.resorts.show', $resort) }}" class="small fw-semibold link-primary link-underline-opacity-0 me-2">View</a>
+                                    <a href="{{ route($isAdmin ? 'admin.resorts.rooms.index' : 'partner.resorts.rooms.index', $resort) }}" class="small fw-semibold link-primary link-underline-opacity-0 me-2">Manage Rooms</a>
                                     @unless ($isAdmin)
                                         <a href="{{ route('partner.resorts.edit', $resort) }}" class="small fw-semibold link-primary link-underline-opacity-0 me-2">Edit</a>
                                         <button type="button" class="small fw-semibold link-danger link-underline-opacity-0 border-0 bg-transparent p-0" data-bs-toggle="modal" data-bs-target="#deleteResortModal" data-resort-name="{{ $resort->name }}" data-resort-action="{{ route('partner.resorts.destroy', $resort) }}">
@@ -107,7 +110,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="{{ $isAdmin ? 8 : 7 }}">
+                                <td colspan="{{ $isAdmin ? 9 : 8 }}">
                                     <div class="empty-state">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mx-auto mb-3 text-body-tertiary" width="40" height="40"><path d="M3 18v-7a2 2 0 012-2h14a2 2 0 012 2v7"/><path d="M3 18h18"/><path d="M7 11V7a2 2 0 012-2h6a2 2 0 012 2v4"/></svg>
                                         <h3>{{ $search ? 'No resorts match your search.' : "You haven't added any resorts yet." }}</h3>

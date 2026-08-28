@@ -6,9 +6,11 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\GuideAvailabilityController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
 use App\Http\Controllers\ResortController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +37,10 @@ Route::middleware('auth')->group(function (): void {
 // Traveler dashboard
 Route::middleware(['auth', 'traveler'])->group(function (): void {
     Route::view('/traveler', 'dashboard.traveler')->name('traveler.dashboard');
+
+    // Browse resorts & rooms — read-only, active listings only
+    Route::resource('traveler/resorts', ResortController::class)->only(['index', 'show'])->names('traveler.resorts');
+    Route::resource('traveler/resorts.rooms', RoomController::class)->only(['index', 'show'])->names('traveler.resorts.rooms');
 });
 
 // Travel Partner dashboard
@@ -47,9 +53,26 @@ Route::middleware(['auth', 'partner'])->group(function (): void {
     Route::post('/partner/verifications', [ProviderVerificationController::class, 'store'])->name('partner.verifications.store');
     Route::get('/partner/verifications/{verification}', [ProviderVerificationController::class, 'show'])->name('partner.verifications.show');
 
+    // Guide Availability — verified Tour Guides publish and manage bookable slots.
+    Route::get('/partner/availability', [GuideAvailabilityController::class, 'index'])->name('partner.availability.index');
+    Route::get('/partner/availability/create', [GuideAvailabilityController::class, 'create'])->name('partner.availability.create');
+    Route::get('/partner/availability/bulk', [GuideAvailabilityController::class, 'bulkCreate'])->name('partner.availability.bulk');
+    Route::get('/partner/availability/{availability}/edit', [GuideAvailabilityController::class, 'edit'])->name('partner.availability.edit');
+
+    Route::middleware('throttle:30,1')->group(function (): void {
+        Route::post('/partner/availability', [GuideAvailabilityController::class, 'store'])->name('partner.availability.store');
+        Route::post('/partner/availability/bulk', [GuideAvailabilityController::class, 'bulkStore'])->name('partner.availability.bulk.store');
+        Route::put('/partner/availability/{availability}', [GuideAvailabilityController::class, 'update'])->name('partner.availability.update');
+        Route::patch('/partner/availability/{availability}/toggle', [GuideAvailabilityController::class, 'toggle'])->name('partner.availability.toggle');
+        Route::delete('/partner/availability/{availability}', [GuideAvailabilityController::class, 'destroy'])->name('partner.availability.destroy');
+    });
+
     // Resort Management — Travel Partner must additionally be an approved provider
     Route::middleware('verified.partner')->group(function (): void {
         Route::resource('partner/resorts', ResortController::class)->names('partner.resorts');
+
+        // Room Management — rooms are nested under the resort they belong to
+        Route::resource('partner/resorts.rooms', RoomController::class)->names('partner.resorts.rooms');
     });
 });
 
@@ -64,6 +87,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
 
     // Resort Management — Admin has read-only access
     Route::resource('admin/resorts', ResortController::class)->only(['index', 'show'])->names('admin.resorts');
+
+    // Room Management — Admin has read-only access
+    Route::resource('admin/resorts.rooms', RoomController::class)->only(['index', 'show'])->names('admin.resorts.rooms');
 });
 
 // User profile management

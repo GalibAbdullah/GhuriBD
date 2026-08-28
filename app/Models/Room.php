@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\ResortStatus;
+use App\Enums\RoomStatus;
 use App\Support\StorageImage;
-use Database\Factories\ResortFactory;
+use Database\Factories\RoomFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,20 +12,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
-class Resort extends Model
+class Room extends Model
 {
-    /** @use HasFactory<ResortFactory> */
+    /** @use HasFactory<RoomFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'name',
+        'resort_id',
+        'room_name',
+        'room_type',
         'description',
-        'division',
-        'district',
-        'address',
-        'contact_phone',
-        'price_range',
+        'price_per_night',
+        'capacity',
+        'total_rooms',
+        'available_rooms',
+        'bed_type',
+        'room_size',
         'amenities',
         'cover_image',
         'status',
@@ -35,31 +37,24 @@ class Resort extends Model
     {
         return [
             'amenities' => 'array',
+            'price_per_night' => 'decimal:2',
         ];
     }
 
     /**
-     * The Travel Partner who owns this resort listing.
+     * The resort this room belongs to.
      */
-    public function user(): BelongsTo
+    public function resort(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Resort::class);
     }
 
     /**
-     * The gallery images attached to this resort.
+     * The gallery images attached to this room.
      */
     public function images(): HasMany
     {
-        return $this->hasMany(ResortImage::class);
-    }
-
-    /**
-     * The rooms belonging to this resort.
-     */
-    public function rooms(): HasMany
-    {
-        return $this->hasMany(Room::class);
+        return $this->hasMany(RoomImage::class);
     }
 
     /**
@@ -72,28 +67,28 @@ class Resort extends Model
         );
     }
 
-    public function isActive(): bool
+    public function isAvailable(): bool
     {
-        return $this->status === ResortStatus::ACTIVE->value;
+        return $this->status === RoomStatus::AVAILABLE->value;
     }
 
-    public function isInactive(): bool
+    public function isUnavailable(): bool
     {
-        return $this->status === ResortStatus::INACTIVE->value;
+        return $this->status === RoomStatus::UNAVAILABLE->value;
     }
 
     /**
      * Delete the cover image and every gallery image (each via its own
-     * model delete, so ResortImage's own file-cleanup hook runs too).
+     * model delete, so RoomImage's own file-cleanup hook runs too).
      */
     protected static function booted(): void
     {
-        static::deleting(function (Resort $resort): void {
-            if ($resort->cover_image) {
-                Storage::disk('public')->delete($resort->cover_image);
+        static::deleting(function (Room $room): void {
+            if ($room->cover_image) {
+                Storage::disk('public')->delete($room->cover_image);
             }
 
-            $resort->images->each->delete();
+            $room->images->each->delete();
         });
     }
 }
