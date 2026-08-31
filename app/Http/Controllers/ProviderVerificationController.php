@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProviderType;
+use App\Enums\UserRole;
 use App\Enums\VerificationStatus;
 use App\Http\Requests\ProviderVerificationRequest;
 use App\Http\Requests\VerificationReviewRequest;
 use App\Models\ProviderVerification;
+use App\Models\User;
+use App\Notifications\VerificationApproved;
+use App\Notifications\VerificationRejected;
+use App\Notifications\VerificationRequestSubmitted;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -57,9 +63,14 @@ class ProviderVerificationController extends Controller
         // Securely store the document on Laravel Storage (public disk).
         $data['verification_document'] = $request->file('verification_document')->store('verification-documents', 'public');
 
-        $request->user()->providerVerifications()->create($data + [
+        $verification = $request->user()->providerVerifications()->create($data + [
             'status' => VerificationStatus::PENDING->value,
         ]);
+
+        Notification::send(
+            User::role(UserRole::ADMIN->value)->get(),
+            new VerificationRequestSubmitted($verification->load('user')),
+        );
 
         return redirect()
             ->route('partner.verifications.status')
@@ -110,6 +121,10 @@ class ProviderVerificationController extends Controller
             'reviewed_by' => $request->user()->id,
             'reviewed_at' => now(),
         ]);
+
+        $verification->user->notify(
+            $isApproved ? new VerificationApproved($verification) : new VerificationRejected($verification)
+        );
 
         $message = $isApproved
             ? 'Verification approved. The Travel Partner is now verified.'
