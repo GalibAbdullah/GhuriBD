@@ -61,6 +61,7 @@
                     <div class="d-flex align-items-center gap-2">
                         @auth
                             <a href="{{ route('dashboard') }}" class="btn btn-light btn-sm">My Dashboard</a>
+                            @include('partials.notification-bell')
                             <a href="{{ route('profile.show') }}" class="d-flex align-items-center justify-content-center overflow-hidden rounded-circle border bg-primary-subtle text-primary-emphasis fw-bold" style="width: 34px; height: 34px; font-size: .75rem;">
                                 @if (auth()->user()->profile_photo)
                                     <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-100 h-100" style="object-fit: cover;">

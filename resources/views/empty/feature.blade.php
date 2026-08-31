@@ -4,11 +4,7 @@
 @section('page-title', $title)
 
 @section('sidebar')
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded active bg-primary-subtle text-primary-emphasis fw-semibold">Explore</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Resorts</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Tours</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Guides</a>
-    <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action border-0 rounded">Back to Dashboard</a>
+    @include('partials.role-sidebar')
 @endsection
 
 @section('content')

@@ -4,19 +4,26 @@
 @section('page-title', 'Partner Dashboard')
 
 @section('sidebar')
-    <a href="{{ route('partner.dashboard') }}" class="list-group-item list-group-item-action border-0 rounded active bg-primary-subtle text-primary-emphasis fw-semibold">Dashboard</a>
-    <a href="{{ route('partner.resorts.index') }}" class="list-group-item list-group-item-action border-0 rounded">My Resorts</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Tour Packages</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Guides</a>
-    <a href="{{ route('partner.availability.index') }}" class="list-group-item list-group-item-action border-0 rounded">Availability</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Bookings</a>
-    <a href="{{ route('explore') }}" class="list-group-item list-group-item-action border-0 rounded">Messages</a>
-    <a href="{{ route('partner.verifications.status') }}" class="list-group-item list-group-item-action border-0 rounded">Verification</a>
+    @include('partials.partner-sidebar')
 @endsection
 
 @section('content')
     <div class="mb-3 small text-secondary">
         Manage your resorts, tour packages, and bookings.
+    </div>
+
+    @php
+        $tourPackageStats = [
+            'total' => auth()->user()->tourPackages()->count(),
+            'active' => auth()->user()->tourPackages()->where('status', 'Active')->count(),
+        ];
+        $recentTourPackages = auth()->user()->tourPackages()->latest()->take(3)->get();
+    @endphp
+
+    <!-- Tour package stats -->
+    <div class="row row-cols-1 row-cols-sm-2 g-4 mb-4">
+        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Total Packages</div><div class="fs-3 fw-bold mt-2">{{ $tourPackageStats['total'] }}</div></div></div></div>
+        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Active Packages</div><div class="fs-3 fw-bold mt-2 text-success">{{ $tourPackageStats['active'] }}</div></div></div></div>
     </div>
 
     <!-- Stats -->
@@ -27,20 +34,88 @@
         <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Avg. rating</div><div class="fs-3 fw-bold mt-2">—</div></div></div></div>
     </div>
 
-    <!-- Recent bookings empty -->
+    <!-- Recent tour packages -->
     <div class="mb-4">
         <div class="mb-3 d-flex align-items-center justify-content-between">
-            <h3 class="h6">Recent bookings</h3>
+            <h3 class="h6">Recent tour packages</h3>
+            @if ($recentTourPackages->isNotEmpty())
+                <a href="{{ route('partner.packages.index') }}" class="small fw-semibold link-primary link-underline-opacity-0">View all</a>
+            @endif
         </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="empty-state">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mx-auto mb-3 text-body-tertiary" width="40" height="40"><path d="M4 8a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2a2 2 0 000-4V8z"/></svg>
-                    <h3>No bookings yet</h3>
-                    <p>Once travelers book your listings, they'll appear here.</p>
+        @if ($recentTourPackages->isEmpty())
+            <div class="card">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mx-auto mb-3 text-body-tertiary" width="40" height="40"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
+                        <h3>You haven't created any tour packages yet.</h3>
+                        <p>Create your first tour package to start reaching travelers.</p>
+                        <a href="{{ route('partner.packages.create') }}" class="btn btn-primary btn-sm mt-2">Create Package</a>
+                    </div>
                 </div>
             </div>
-        </div>
+        @else
+            <div class="row row-cols-1 row-cols-sm-3 g-4">
+                @foreach ($recentTourPackages as $tourPackage)
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="{{ $tourPackage->cover_image_url }}" alt="{{ $tourPackage->title }}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                            <div class="card-body">
+                                <h4 class="h6 fw-semibold mb-1">{{ $tourPackage->title }}</h4>
+                                <div class="small text-secondary mb-2">{{ $tourPackage->destination }}</div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    @if ($tourPackage->isActive())
+                                        <span class="badge text-bg-success">Active</span>
+                                    @else
+                                        <span class="badge text-bg-secondary">Inactive</span>
+                                    @endif
+                                    <div>
+                                        <a href="{{ route('partner.packages.show', $tourPackage) }}" class="small fw-semibold link-primary link-underline-opacity-0 me-2">View</a>
+                                        <a href="{{ route('partner.packages.edit', $tourPackage) }}" class="small fw-semibold link-primary link-underline-opacity-0 me-2">Edit</a>
+                                        <button type="button" class="small fw-semibold link-danger link-underline-opacity-0 border-0 bg-transparent p-0" data-bs-toggle="modal" data-bs-target="#deletePackageModal" data-package-title="{{ $tourPackage->title }}" data-package-action="{{ route('partner.packages.destroy', $tourPackage) }}">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Delete confirmation modal -->
+            <div class="modal fade" id="deletePackageModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete tour package?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete <strong id="deletePackageTitle"></strong>? This will permanently remove the listing and all of its photos. This cannot be undone.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <form id="deletePackageForm" method="POST" action="">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete Package</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const deleteModal = document.getElementById('deletePackageModal');
+                    if (!deleteModal) return;
+
+                    deleteModal.addEventListener('show.bs.modal', (event) => {
+                        const button = event.relatedTarget;
+                        document.getElementById('deletePackageTitle').textContent = button.dataset.packageTitle;
+                        document.getElementById('deletePackageForm').action = button.dataset.packageAction;
+                    });
+                });
+            </script>
+        @endif
     </div>
 
     <!-- Quick actions -->
@@ -58,7 +133,7 @@
                 </a>
             </div>
             <div class="col">
-                <a href="{{ route('explore') }}" class="card card-body text-decoration-none h-100">
+                <a href="{{ route('partner.packages.create') }}" class="card card-body text-decoration-none h-100">
                     <div class="text-primary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
                     </div>

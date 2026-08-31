@@ -7,10 +7,12 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\GuideAvailabilityController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
 use App\Http\Controllers\ResortController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\TourPackageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +43,9 @@ Route::middleware(['auth', 'traveler'])->group(function (): void {
     // Browse resorts & rooms — read-only, active listings only
     Route::resource('traveler/resorts', ResortController::class)->only(['index', 'show'])->names('traveler.resorts');
     Route::resource('traveler/resorts.rooms', RoomController::class)->only(['index', 'show'])->names('traveler.resorts.rooms');
+
+    // Browse tour packages — read-only, active listings only
+    Route::resource('traveler/packages', TourPackageController::class)->only(['index', 'show'])->names('traveler.packages');
 });
 
 // Travel Partner dashboard
@@ -73,6 +78,9 @@ Route::middleware(['auth', 'partner'])->group(function (): void {
 
         // Room Management — rooms are nested under the resort they belong to
         Route::resource('partner/resorts.rooms', RoomController::class)->names('partner.resorts.rooms');
+
+        // Tour Package Management — Travel Partner must additionally be an approved provider
+        Route::resource('partner/packages', TourPackageController::class)->names('partner.packages');
     });
 });
 
@@ -90,6 +98,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
 
     // Room Management — Admin has read-only access
     Route::resource('admin/resorts.rooms', RoomController::class)->only(['index', 'show'])->names('admin.resorts.rooms');
+
+    // Tour Package Management — Admin has read-only access
+    Route::resource('admin/packages', TourPackageController::class)->only(['index', 'show'])->names('admin.packages');
 });
 
 // User profile management
@@ -98,6 +109,16 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+});
+
+// Notifications — the literal "read-all" path must be registered before the
+// {notification} wildcard route below, or PUT /notifications/read-all would
+// be swallowed by PUT /notifications/{notification}.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::get('/notifications/{notification}', [NotificationController::class, 'redirectTo'])->name('notifications.redirect');
+    Route::put('/notifications/{notification}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 // Generic dashboard entry point — redirects each authenticated user to their role dashboard.

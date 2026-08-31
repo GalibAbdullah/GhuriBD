@@ -92,4 +92,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(GuideAvailability::class);
     }
+
+    /**
+     * All tour packages owned by this Travel Partner.
+     */
+    public function tourPackages(): HasMany
+    {
+        return $this->hasMany(TourPackage::class);
+    }
 }
