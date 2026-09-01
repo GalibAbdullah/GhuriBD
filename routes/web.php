@@ -12,11 +12,16 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
 use App\Http\Controllers\ResortController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TourPackageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+
+// Smart Destination Search — public, works for guests and any authenticated role.
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+Route::get('/search/results', [SearchController::class, 'results'])->name('search.results');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
