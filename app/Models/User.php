@@ -100,4 +100,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(TourPackage::class);
     }
+
+    /**
+     * All bookings made by this Traveler.
+     */
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

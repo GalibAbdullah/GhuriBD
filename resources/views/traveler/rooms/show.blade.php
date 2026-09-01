@@ -30,7 +30,7 @@
             @else
                 <span class="badge text-bg-secondary">Unavailable</span>
             @endif
-            <a href="{{ route('explore') }}" class="btn btn-primary btn-sm">Book Now</a>
+            <a href="{{ route('bookings.resorts.create', [$resort, $room]) }}" class="btn btn-primary btn-sm">Book Now</a>
         </div>
     </div>
 

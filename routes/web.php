@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\GuideAvailabilityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -46,6 +47,16 @@ Route::middleware(['auth', 'traveler'])->group(function (): void {
 
     // Browse tour packages — read-only, active listings only
     Route::resource('traveler/packages', TourPackageController::class)->only(['index', 'show'])->names('traveler.packages');
+
+    // Booking System — a Traveler's own bookings, and the 3 checkout flows
+    Route::get('traveler/bookings', [BookingController::class, 'index'])->name('traveler.bookings.index');
+    Route::get('traveler/bookings/{booking}', [BookingController::class, 'show'])->name('traveler.bookings.show');
+    Route::patch('traveler/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('traveler.bookings.cancel');
+
+    Route::get('bookings/resorts/{resort}/rooms/{room}/create', [BookingController::class, 'createResort'])->name('bookings.resorts.create');
+    Route::get('bookings/packages/{package}/create', [BookingController::class, 'createPackage'])->name('bookings.packages.create');
+    Route::get('bookings/combined/create', [BookingController::class, 'createCombined'])->name('bookings.combined.create');
+    Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
 });
 
 // Travel Partner dashboard
@@ -82,6 +93,10 @@ Route::middleware(['auth', 'partner'])->group(function (): void {
         // Tour Package Management — Travel Partner must additionally be an approved provider
         Route::resource('partner/packages', TourPackageController::class)->names('partner.packages');
     });
+
+    // Booking System — read-only view of bookings for the Partner's own resorts/packages
+    Route::get('partner/bookings', [BookingController::class, 'index'])->name('partner.bookings.index');
+    Route::get('partner/bookings/{booking}', [BookingController::class, 'show'])->name('partner.bookings.show');
 });
 
 // Admin dashboard
@@ -101,6 +116,10 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
 
     // Tour Package Management — Admin has read-only access
     Route::resource('admin/packages', TourPackageController::class)->only(['index', 'show'])->names('admin.packages');
+
+    // Booking System — Admin can view every booking
+    Route::get('admin/bookings', [BookingController::class, 'index'])->name('admin.bookings.index');
+    Route::get('admin/bookings/{booking}', [BookingController::class, 'show'])->name('admin.bookings.show');
 });
 
 // User profile management

@@ -63,6 +63,14 @@ class Resort extends Model
     }
 
     /**
+     * All bookings placed against this resort.
+     */
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
      * Serve the cover image from Laravel Storage (public disk).
      */
     protected function coverImageUrl(): Attribute

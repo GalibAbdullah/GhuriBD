@@ -24,7 +24,11 @@
             <h3 class="h4 mb-1">{{ $tourPackage->title }}</h3>
             <div class="small text-secondary">{{ $tourPackage->destination }} &middot; {{ $tourPackage->district }}, {{ $tourPackage->division }}</div>
         </div>
-        <span class="badge text-bg-light border">{{ $tourPackage->duration_days }}D / {{ $tourPackage->duration_nights }}N</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge text-bg-light border">{{ $tourPackage->duration_days }}D / {{ $tourPackage->duration_nights }}N</span>
+            <a href="{{ route('bookings.combined.create', ['package' => $tourPackage->id]) }}" class="btn btn-outline-secondary btn-sm">Combine with a Resort</a>
+            <a href="{{ route('bookings.packages.create', $tourPackage) }}" class="btn btn-primary btn-sm">Book This Package</a>
+        </div>
     </div>
 
     <div class="row g-4">
