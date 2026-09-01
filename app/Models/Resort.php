@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ResortStatus;
 use App\Support\StorageImage;
 use Database\Factories\ResortFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -88,6 +89,63 @@ class Resort extends Model
     public function isInactive(): bool
     {
         return $this->status === ResortStatus::INACTIVE->value;
+    }
+
+    /**
+     * Case-insensitive, partial-match search across the resort's name,
+     * location fields, description, and amenities (matched as raw JSON text
+     * so "pool" still finds "Swimming Pool").
+     */
+    public function scopeSearchKeyword(Builder $query, string $keyword): Builder
+    {
+        $term = '%'.mb_strtolower($keyword).'%';
+
+        return $query->where(function (Builder $query) use ($term): void {
+            $query->whereRaw('LOWER(name) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(division) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(district) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(address) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(description) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(amenities) LIKE ?', [$term]);
+        });
+    }
+
+    /**
+     * Apply the shared advanced-search filters. Resorts have no numeric price
+     * column of their own, so the price range filter matches against the
+     * price of any room belonging to the resort.
+     *
+     * @param  array{division?: ?string, district?: ?string, destination?: ?string, min_price?: ?float, max_price?: ?float, amenities?: ?array<int, string>}  $filters
+     */
+    public function scopeApplyFilters(Builder $query, array $filters): Builder
+    {
+        return $query
+            ->when($filters['division'] ?? null, fn (Builder $query, string $division) => $query->where('division', $division))
+            ->when($filters['district'] ?? null, fn (Builder $query, string $district) => $query->where('district', $district))
+            ->when($filters['destination'] ?? null, function (Builder $query, string $destination): void {
+                $term = '%'.mb_strtolower($destination).'%';
+
+                $query->where(function (Builder $query) use ($term): void {
+                    $query->whereRaw('LOWER(name) LIKE ?', [$term])
+                        ->orWhereRaw('LOWER(division) LIKE ?', [$term])
+                        ->orWhereRaw('LOWER(district) LIKE ?', [$term])
+                        ->orWhereRaw('LOWER(address) LIKE ?', [$term]);
+                });
+            })
+            ->when(
+                ($filters['min_price'] ?? null) !== null || ($filters['max_price'] ?? null) !== null,
+                function (Builder $query) use ($filters): void {
+                    $query->whereHas('rooms', function (Builder $query) use ($filters): void {
+                        $query->when($filters['min_price'] ?? null, fn (Builder $query, $min) => $query->where('price_per_night', '>=', $min))
+                            ->when($filters['max_price'] ?? null, fn (Builder $query, $max) => $query->where('price_per_night', '<=', $max));
+                    });
+                }
+            )
+            ->when(! empty($filters['amenities']), function (Builder $query) use ($filters): void {
+                foreach ($filters['amenities'] as $amenity) {
+                    $query->whereRaw('LOWER(amenities) LIKE ?', ['%'.mb_strtolower($amenity).'%']);
+                }
+            });
     }
 
     /**

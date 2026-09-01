@@ -15,7 +15,7 @@
             @include('partials.logo', ['href' => route('home')])
 
             <div class="d-none d-md-flex align-items-center gap-4 small fw-medium text-secondary">
-                <a href="#explore" class="link-secondary link-underline-opacity-0 link-underline-opacity-100-hover">Explore</a>
+                <a href="{{ route('search.index') }}" class="link-secondary link-underline-opacity-0 link-underline-opacity-100-hover">Explore</a>
                 <a href="#guides" class="link-secondary link-underline-opacity-0 link-underline-opacity-100-hover">Guides</a>
                 <a href="#ai" class="link-secondary link-underline-opacity-0 link-underline-opacity-100-hover">AI Planner</a>
             </div>
@@ -118,26 +118,18 @@
             </p>
 
             <div class="hero-search mt-4" style="max-width: 640px;">
-                <div class="card p-3">
+                <form method="GET" action="{{ route('search.results') }}" class="card p-3">
                     <div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-end">
                         <div class="flex-fill">
                             <label class="form-label text-secondary">Destination</label>
-                            <input class="form-control" placeholder="Cox's Bazar" readonly>
+                            <input type="search" name="q" class="form-control" placeholder="Cox's Bazar">
                         </div>
-                        <div class="flex-fill">
-                            <label class="form-label text-secondary">Dates</label>
-                            <input class="form-control" placeholder="12 – 15 Sep" readonly>
-                        </div>
-                        <div class="flex-fill">
-                            <label class="form-label text-secondary">Guests</label>
-                            <input class="form-control" placeholder="2 adults" readonly>
-                        </div>
-                        <a href="{{ route('register') }}" class="btn btn-warning d-flex align-items-center gap-2 justify-content-center">
+                        <button type="submit" class="btn btn-warning d-flex align-items-center gap-2 justify-content-center">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
                             Search
-                        </a>
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </header>
@@ -150,10 +142,10 @@
         <div class="row row-cols-2 row-cols-lg-4 g-4 mb-5">
             @foreach (["Cox's Bazar", 'Sajek Valley', 'Bandarban', 'Sylhet'] as $dest)
                 <div class="col">
-                    <div class="card overflow-hidden h-100" role="button" onclick="document.querySelector('#explore')?.scrollIntoView({behavior:'smooth'})">
+                    <a href="{{ route('search.results', ['q' => $dest]) }}" class="card overflow-hidden h-100 text-decoration-none text-reset">
                         <div class="d-flex align-items-center justify-content-center bg-destination-gradient fs-1 ratio ratio-1x1">🏝️</div>
                         <div class="px-3 py-2 small fw-bold">{{ $dest }}</div>
-                    </div>
+                    </a>
                 </div>
             @endforeach
         </div>

@@ -2,7 +2,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
     Home
 </a>
-<a href="{{ route('explore') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+<a href="{{ route('search.index') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded {{ request()->routeIs('search.*') ? 'active bg-primary-subtle text-primary-emphasis fw-semibold' : '' }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2z"/></svg>
     Explore
 </a>
