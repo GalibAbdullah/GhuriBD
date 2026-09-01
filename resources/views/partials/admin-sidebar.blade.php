@@ -18,7 +18,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
     Packages
 </a>
-<a href="{{ route('explore') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+<a href="{{ route('admin.bookings.index') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded {{ request()->routeIs('admin.bookings.*') ? 'active bg-primary-subtle text-primary-emphasis fw-semibold' : '' }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M4 8a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2a2 2 0 000-4V8z"/></svg>
     Bookings
 </a>

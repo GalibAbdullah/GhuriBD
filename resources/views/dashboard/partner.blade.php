@@ -18,6 +18,11 @@
             'active' => auth()->user()->tourPackages()->where('status', 'Active')->count(),
         ];
         $recentTourPackages = auth()->user()->tourPackages()->latest()->take(3)->get();
+        $monthlyBookingsCount = \App\Models\Booking::query()
+            ->forPartner(auth()->user())
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
     @endphp
 
     <!-- Tour package stats -->
@@ -28,7 +33,7 @@
 
     <!-- Stats -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 mb-4">
-        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">This month's bookings</div><div class="fs-3 fw-bold mt-2">0</div></div></div></div>
+        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">This month's bookings</div><div class="fs-3 fw-bold mt-2">{{ $monthlyBookingsCount }}</div></div></div></div>
         <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Revenue (Aug)</div><div class="fs-3 fw-bold mt-2 font-monospace">৳0</div></div></div></div>
         <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Occupancy rate</div><div class="fs-3 fw-bold mt-2">—</div></div></div></div>
         <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Avg. rating</div><div class="fs-3 fw-bold mt-2">—</div></div></div></div>

@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Booking;
 use App\Models\GuideAvailability;
 use App\Models\ProviderVerification;
 use App\Models\Resort;
 use App\Models\Room;
 use App\Models\TourPackage;
+use App\Policies\BookingPolicy;
 use App\Policies\GuideAvailabilityPolicy;
 use App\Policies\ProviderVerificationPolicy;
 use App\Policies\ResortPolicy;
@@ -30,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Room::class, RoomPolicy::class);
         Gate::policy(GuideAvailability::class, GuideAvailabilityPolicy::class);
         Gate::policy(TourPackage::class, TourPackagePolicy::class);
+        Gate::policy(Booking::class, BookingPolicy::class);
 
         // Feeds the notification bell (unread count + preview list) in the
         // shared layout, wherever it's rendered.
