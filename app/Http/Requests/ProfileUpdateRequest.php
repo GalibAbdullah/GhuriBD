@@ -30,7 +30,7 @@ class ProfileUpdateRequest extends FormRequest
             'date_of_birth' => ['nullable', 'date', 'before:today'],
             'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
             'address' => ['nullable', 'string', 'max:1000'],
-            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp,bmp,svg,avif,heic,heif,tiff', 'max:5120'],
+            'profile_photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,bmp,svg,avif,heic,heif,tiff', 'max:5120'],
         ];
     }
 

@@ -50,12 +50,12 @@ class RoomRequest extends FormRequest
             'status' => ['required', 'string', Rule::in(RoomStatus::values())],
             'cover_image' => [
                 $isCreating ? 'required' : 'sometimes',
-                'image',
-                'mimes:jpeg,jpg,png,webp',
+                'file',
+                'mimes:jpeg,jpg,png,gif,webp,bmp,svg,avif,heic,heif,tiff',
                 'max:4096',
             ],
             'gallery_images' => ['nullable', 'array', 'max:10'],
-            'gallery_images.*' => ['image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
+            'gallery_images.*' => ['file', 'mimes:jpeg,jpg,png,gif,webp,bmp,svg,avif,heic,heif,tiff', 'max:4096'],
             'remove_gallery_images' => ['nullable', 'array'],
             'remove_gallery_images.*' => ['integer', 'exists:room_images,id'],
         ];
@@ -86,11 +86,11 @@ class RoomRequest extends FormRequest
             'status.in' => 'Please select a valid status.',
             'cover_image.required' => 'Please upload a cover image for this room.',
             'cover_image.image' => 'The cover image must be a valid image file.',
-            'cover_image.mimes' => 'The cover image must be a JPEG, PNG, or WEBP file.',
+            'cover_image.mimes' => 'The cover image must be a valid image file (JPEG, PNG, GIF, WebP, BMP, SVG, AVIF, HEIC, HEIF, or TIFF).',
             'cover_image.max' => 'The cover image may not be larger than 4 MB.',
             'gallery_images.max' => 'You may upload up to 10 gallery images at a time.',
             'gallery_images.*.image' => 'Each gallery upload must be a valid image file.',
-            'gallery_images.*.mimes' => 'Gallery images must be JPEG, PNG, or WEBP files.',
+            'gallery_images.*.mimes' => 'Gallery images must be a valid image file (JPEG, PNG, GIF, WebP, BMP, SVG, AVIF, HEIC, HEIF, or TIFF).',
             'gallery_images.*.max' => 'Each gallery image may not be larger than 4 MB.',
         ];
     }

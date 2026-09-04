@@ -114,7 +114,7 @@
         <img id="coverPreview" src="{{ $room->cover_image_url ?? '' }}" alt="Cover preview" class="rounded border" style="width: 160px; height: 100px; object-fit: cover;">
     </div>
     <input id="cover_image" type="file" name="cover_image" accept="image/*" class="form-control @error('cover_image') is-invalid @enderror" {{ isset($room) ? '' : 'required' }}>
-    <div class="form-text">JPEG, PNG, or WEBP. Max 4 MB.@if (isset($room)) Leave empty to keep the current cover.@endif</div>
+    <div class="form-text">JPEG, PNG, GIF, WebP, BMP, SVG, AVIF, HEIC, HEIF, or TIFF. Max 4 MB.@if (isset($room)) Leave empty to keep the current cover.@endif</div>
     @error('cover_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
 </div>
 
@@ -142,7 +142,7 @@
 <div class="mb-4">
     <label for="gallery_images" class="form-label">{{ isset($room) ? 'Add Gallery Images' : 'Gallery Images' }}</label>
     <input id="gallery_images" type="file" name="gallery_images[]" accept="image/*" multiple class="form-control @error('gallery_images') is-invalid @enderror">
-    <div class="form-text">Up to 10 photos. JPEG, PNG, or WEBP, max 4 MB each.</div>
+    <div class="form-text">Up to 10 photos. JPEG, PNG, GIF, WebP, BMP, SVG, AVIF, HEIC, HEIF, or TIFF, max 4 MB each.</div>
     @error('gallery_images')<div class="invalid-feedback">{{ $message }}</div>@enderror
     @error('gallery_images.*')<div class="text-danger small fw-medium mt-1">{{ $message }}</div>@enderror
     <div id="galleryPreview" class="row row-cols-3 row-cols-sm-4 g-2 mt-1"></div>
