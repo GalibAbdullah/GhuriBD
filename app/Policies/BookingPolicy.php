@@ -69,4 +69,24 @@ class BookingPolicy
 
         return Response::allow();
     }
+
+    /**
+     * Only the Travel Partner who owns the booked resort/package may mark a
+     * booking Completed, and only once it's Confirmed.
+     */
+    public function complete(User $user, Booking $booking): Response
+    {
+        $ownsService = $booking->resort?->user_id === $user->id
+            || $booking->tourPackage?->user_id === $user->id;
+
+        if (! $ownsService) {
+            return Response::denyWithStatus(403);
+        }
+
+        if (! $booking->isConfirmed()) {
+            return Response::denyWithStatus(403, 'Only confirmed bookings can be marked as completed.');
+        }
+
+        return Response::allow();
+    }
 }

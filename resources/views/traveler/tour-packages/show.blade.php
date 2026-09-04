@@ -15,8 +15,9 @@
     </div>
 
     <!-- Hero -->
-    <div class="rounded-4 overflow-hidden mb-4" style="height: 280px;">
+    <div class="position-relative rounded-4 overflow-hidden mb-4" style="height: 280px;">
         <img src="{{ $tourPackage->cover_image_url }}" alt="{{ $tourPackage->title }}" class="w-100 h-100" style="object-fit: cover;">
+        @include('wishlist.partials.heart-button', ['type' => 'package', 'model' => $tourPackage, 'wishlisted' => $isWishlisted])
     </div>
 
     <div class="mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -78,7 +79,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-body">
                     <h4 class="h6 fw-semibold mb-3">Gallery</h4>
                     @if ($tourPackage->images->isNotEmpty())
@@ -94,6 +95,21 @@
                             <p class="mb-0">No gallery images added yet.</p>
                         </div>
                     @endif
+                </div>
+            </div>
+
+            @include('reviews.partials._summary', ['reviews' => $tourPackage->reviews, 'ratingCounts' => $ratingCounts])
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="h6 fw-semibold mb-3">What Travelers Say</h4>
+                    @forelse ($tourPackage->reviews as $review)
+                        @include('reviews.partials._review-card', ['review' => $review])
+                    @empty
+                        <div class="empty-state py-4">
+                            <p class="mb-0">No reviews yet. Be the first to share your experience.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>

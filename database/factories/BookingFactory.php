@@ -64,4 +64,15 @@ class BookingFactory extends Factory
             'payment_status' => PaymentStatus::PAID->value,
         ]);
     }
+
+    /**
+     * A finished booking — eligible for a review.
+     */
+    public function completed(): static
+    {
+        return $this->state([
+            'booking_status' => BookingStatus::COMPLETED->value,
+            'payment_status' => PaymentStatus::PAID->value,
+        ]);
+    }
 }

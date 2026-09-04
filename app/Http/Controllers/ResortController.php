@@ -112,10 +112,14 @@ class ResortController extends Controller
     {
         Gate::authorize('view', $resort);
 
-        $resort = $resort->load(['user', 'images'])->loadCount('rooms');
+        $resort = $resort->load(['user', 'images', 'reviews.user'])->loadCount('rooms');
 
         if ($request->user()->hasRole(UserRole::TRAVELER->value)) {
-            return view('traveler.resorts.show', ['resort' => $resort]);
+            return view('traveler.resorts.show', [
+                'resort' => $resort,
+                'isWishlisted' => $request->user()->wishlists()->where('resort_id', $resort->id)->exists(),
+                'ratingCounts' => $resort->reviews->countBy('rating'),
+            ]);
         }
 
         return view('resorts.show', [

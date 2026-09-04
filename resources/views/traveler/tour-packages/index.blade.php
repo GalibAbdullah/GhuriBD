@@ -37,17 +37,20 @@
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
             @foreach ($tourPackages as $tourPackage)
                 <div class="col">
-                    <a href="{{ route('traveler.packages.show', $tourPackage) }}" class="card h-100 text-decoration-none text-reset">
-                        <img src="{{ $tourPackage->cover_image_url }}" alt="{{ $tourPackage->title }}" class="card-img-top" style="height: 160px; object-fit: cover;">
-                        <div class="card-body">
-                            <h4 class="h6 fw-semibold mb-1">{{ $tourPackage->title }}</h4>
-                            <div class="small text-secondary mb-2">{{ $tourPackage->destination }} &middot; {{ $tourPackage->duration_days }}D / {{ $tourPackage->duration_nights }}N</div>
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="small fw-semibold font-monospace">৳{{ number_format($tourPackage->price, 2) }}</span>
-                                <span class="badge text-bg-light border">Up to {{ $tourPackage->max_travelers }}</span>
+                    <div class="position-relative h-100">
+                        @include('wishlist.partials.heart-button', ['type' => 'package', 'model' => $tourPackage, 'wishlisted' => $wishlistedPackageIds->contains($tourPackage->id)])
+                        <a href="{{ route('traveler.packages.show', $tourPackage) }}" class="card h-100 text-decoration-none text-reset">
+                            <img src="{{ $tourPackage->cover_image_url }}" alt="{{ $tourPackage->title }}" class="card-img-top" style="height: 160px; object-fit: cover;">
+                            <div class="card-body">
+                                <h4 class="h6 fw-semibold mb-1">{{ $tourPackage->title }}</h4>
+                                <div class="small text-secondary mb-2">{{ $tourPackage->destination }} &middot; {{ $tourPackage->duration_days }}D / {{ $tourPackage->duration_nights }}N</div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small fw-semibold font-monospace">৳{{ number_format($tourPackage->price, 2) }}</span>
+                                    <span class="badge text-bg-light border">Up to {{ $tourPackage->max_travelers }}</span>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
                 </div>
             @endforeach
         </div>

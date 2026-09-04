@@ -190,6 +190,18 @@
                 </form>
             @endif
 
+            @if ($audience === 'traveler' && $booking->isReviewable())
+                <a href="{{ route('traveler.reviews.create', $booking) }}" class="btn btn-primary w-100 mb-3">Write a Review</a>
+            @endif
+
+            @can('complete', $booking)
+                <form method="POST" action="{{ route('partner.bookings.complete', $booking) }}" class="mb-3">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="btn btn-success w-100">Mark as Completed</button>
+                </form>
+            @endcan
+
             @if ($audience === 'traveler' && $booking->isCancellable())
                 <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelBookingModal">Cancel Booking</button>
 

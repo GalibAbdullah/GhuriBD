@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
 use App\Models\Booking;
 use App\Models\Complaint;
 use App\Models\Conversation;
@@ -9,9 +10,11 @@ use App\Models\GuideAvailability;
 use App\Models\ProviderVerification;
 use App\Models\Payment;
 use App\Models\Resort;
+use App\Models\Review;
 use App\Models\Room;
 use App\Models\TourPackage;
 use App\Models\TourPlan;
+use App\Models\Wishlist;
 use App\Payments\MockPaymentGateway;
 use App\Payments\PaymentGateway;
 use App\Planning\RuleBasedTourPlanner;
@@ -23,9 +26,11 @@ use App\Policies\PaymentPolicy;
 use App\Policies\GuideAvailabilityPolicy;
 use App\Policies\ProviderVerificationPolicy;
 use App\Policies\ResortPolicy;
+use App\Policies\ReviewPolicy;
 use App\Policies\RoomPolicy;
 use App\Policies\TourPackagePolicy;
 use App\Policies\TourPlanPolicy;
+use App\Policies\WishlistPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -52,6 +57,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(TourPackage::class, TourPackagePolicy::class);
         Gate::policy(Booking::class, BookingPolicy::class);
         Gate::policy(Payment::class, PaymentPolicy::class);
+        Gate::policy(Wishlist::class, WishlistPolicy::class);
+        Gate::policy(Review::class, ReviewPolicy::class);
         Gate::policy(Conversation::class, ConversationPolicy::class);
         Gate::policy(Complaint::class, ComplaintPolicy::class);
         Gate::policy(TourPlan::class, TourPlanPolicy::class);
@@ -66,6 +73,23 @@ class AppServiceProvider extends ServiceProvider
                 'recentNotifications' => $user
                     ? $user->notifications()->latest()->take(8)->get()
                     : collect(),
+            ]);
+        });
+
+        // Feeds the wishlist heart icon on resort/package cards and detail
+        // pages, wherever they're rendered — only Travelers can wishlist.
+        View::composer([
+            'search.partials.resort-card',
+            'search.partials.package-card',
+            'traveler.resorts.index',
+            'traveler.tour-packages.index',
+        ], function ($view): void {
+            $user = auth()->user();
+            $isTraveler = $user?->hasRole(UserRole::TRAVELER->value) ?? false;
+
+            $view->with([
+                'wishlistedResortIds' => $isTraveler ? $user->wishlists()->whereNotNull('resort_id')->pluck('resort_id') : collect(),
+                'wishlistedPackageIds' => $isTraveler ? $user->wishlists()->whereNotNull('tour_package_id')->pluck('tour_package_id') : collect(),
             ]);
         });
     }

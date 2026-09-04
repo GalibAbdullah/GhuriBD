@@ -110,6 +110,22 @@ class User extends Authenticatable
     }
 
     /**
+     * This Traveler's saved resorts and tour packages.
+     */
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Reviews written by this Traveler.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
      * Conversations in which this user is the Traveler side.
      */
     public function travelerConversations(): HasMany
