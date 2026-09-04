@@ -222,6 +222,26 @@ class GuideAvailability extends Model
         return $query->where('status', $status);
     }
 
+    /**
+     * Bookable from a traveler's point of view, expressed in SQL: available,
+     * not full, and not yet ended — the query-side twin of isBookable().
+     */
+    public function scopeBookable(Builder $query): Builder
+    {
+        $now = Carbon::now(self::timezone());
+
+        return $query
+            ->where('status', AvailabilityStatus::AVAILABLE->value)
+            ->whereColumn('booked_count', '<', 'capacity')
+            ->where(function (Builder $query) use ($now): void {
+                $query->whereDate('available_date', '>', $now->toDateString())
+                    ->orWhere(function (Builder $query) use ($now): void {
+                        $query->whereDate('available_date', $now->toDateString())
+                            ->where('end_time', '>', $now->format('H:i:s'));
+                    });
+            });
+    }
+
     public function scopeInMonth(Builder $query, int $year, int $month): Builder
     {
         $start = Carbon::create($year, $month, 1, 0, 0, 0, self::timezone());

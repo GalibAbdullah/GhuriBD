@@ -30,11 +30,11 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M16 15h2"/></svg>
     Payments
 </a>
-<a href="{{ route('explore') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+<a href="{{ route('complaints.index') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded {{ request()->routeIs('complaints.*') ? 'active bg-primary-subtle text-primary-emphasis fw-semibold' : '' }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg>
     Complaints
 </a>
-<a href="{{ route('explore') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded">
+<a href="{{ route('admin.analytics.index') }}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded {{ request()->routeIs('admin.analytics.*') ? 'active bg-primary-subtle text-primary-emphasis fw-semibold' : '' }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>
     Analytics
 </a>

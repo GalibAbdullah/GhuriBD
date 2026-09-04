@@ -124,4 +124,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    /**
+     * Conversations in which this user is the Traveler side.
+     */
+    public function travelerConversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'traveler_id');
+    }
+
+    /**
+     * Conversations in which this user is the Travel Partner side.
+     */
+    public function partnerConversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'partner_id');
+    }
+
+    /**
+     * Complaints filed by this user.
+     */
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class);
+    }
 }

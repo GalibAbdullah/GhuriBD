@@ -1,13 +1,16 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\AdminAnalyticsController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\GuideAvailabilityController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
@@ -17,6 +20,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TourPackageController;
+use App\Http\Controllers\TourPlanController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -152,6 +156,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
     // Reviews & Ratings — Admin can view and delete inappropriate reviews.
     Route::get('admin/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');
     Route::delete('admin/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+    // Admin Dashboard & Analytics
+    Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
 });
 
 // User profile management
@@ -170,6 +177,44 @@ Route::middleware(['auth'])->group(function (): void {
     Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::get('/notifications/{notification}', [NotificationController::class, 'redirectTo'])->name('notifications.redirect');
     Route::put('/notifications/{notification}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+});
+
+// Live Chat with Provider — a Traveler's and a Travel Partner's shared
+// inbox; the policy scopes everything to conversations the user is in.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
+
+    Route::middleware('throttle:30,1')->group(function (): void {
+        Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+        Route::post('/messages/{conversation}/reply', [MessageController::class, 'reply'])->name('messages.reply');
+    });
+});
+
+// Complaint & Support System — Travelers/Partners file and track their own
+// complaints; Admins see every complaint and respond via the admin route.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('/complaints/create', [ComplaintController::class, 'create'])->name('complaints.create');
+    Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaints.store');
+    Route::get('/complaints/{complaint}', [ComplaintController::class, 'show'])->name('complaints.show');
+});
+
+Route::middleware(['auth', 'admin'])->group(function (): void {
+    Route::put('/admin/complaints/{complaint}', [ComplaintController::class, 'respond'])->name('admin.complaints.respond');
+});
+
+// AI Tour Planner — a Traveler's own itineraries.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/tour-plans', [TourPlanController::class, 'index'])->name('tour-plans.index');
+    Route::get('/tour-plans/create', [TourPlanController::class, 'create'])->name('tour-plans.create');
+    Route::get('/tour-plans/{plan}', [TourPlanController::class, 'show'])->name('tour-plans.show');
+
+    Route::middleware('throttle:20,1')->group(function (): void {
+        Route::post('/tour-plans', [TourPlanController::class, 'store'])->name('tour-plans.store');
+        Route::post('/tour-plans/{plan}/regenerate', [TourPlanController::class, 'regenerate'])->name('tour-plans.regenerate');
+        Route::delete('/tour-plans/{plan}', [TourPlanController::class, 'destroy'])->name('tour-plans.destroy');
+    });
 });
 
 // Generic dashboard entry point — redirects each authenticated user to their role dashboard.
