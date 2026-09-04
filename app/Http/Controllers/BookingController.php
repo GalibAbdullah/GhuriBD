@@ -11,6 +11,7 @@ use App\Enums\TourPackageStatus;
 use App\Enums\UserRole;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
+use App\Models\GuideAvailability;
 use App\Models\Resort;
 use App\Models\Room;
 use App\Models\TourPackage;
@@ -45,9 +46,9 @@ class BookingController extends Controller
             : null;
 
         $query = match (true) {
-            $isAdmin => Booking::query()->with(['user', 'resort', 'room', 'tourPackage']),
-            $isPartner => Booking::query()->forPartner($user)->with(['user', 'resort', 'room', 'tourPackage']),
-            default => $user->bookings()->with(['resort', 'room', 'tourPackage']),
+            $isAdmin => Booking::query()->with(['user', 'resort', 'room', 'tourPackage', 'guideAvailability.guide']),
+            $isPartner => Booking::query()->forPartner($user)->with(['user', 'resort', 'room', 'tourPackage', 'guideAvailability.guide']),
+            default => $user->bookings()->with(['resort', 'room', 'tourPackage', 'guideAvailability.guide']),
         };
 
         if (! $isAdmin && ! $isPartner) {
@@ -62,14 +63,15 @@ class BookingController extends Controller
         $type = null;
 
         if ($isPartner) {
-            $type = in_array($request->query('type'), ['resort', 'package'], true)
+            $type = in_array($request->query('type'), ['resort', 'package', 'guide'], true)
                 ? $request->query('type')
                 : null;
 
-            // Scoped to bookings on THIS partner's own resort/package, not
-            // merely any booking that happens to have a resort_id set.
+            // Scoped to bookings on THIS partner's own resort/package/guide slot,
+            // not merely any booking that happens to have that FK set.
             $query->when($type === 'resort', fn ($query) => $query->whereHas('resort', fn ($query) => $query->where('user_id', $user->id)))
-                ->when($type === 'package', fn ($query) => $query->whereHas('tourPackage', fn ($query) => $query->where('user_id', $user->id)));
+                ->when($type === 'package', fn ($query) => $query->whereHas('tourPackage', fn ($query) => $query->where('user_id', $user->id)))
+                ->when($type === 'guide', fn ($query) => $query->whereHas('guideAvailability', fn ($query) => $query->where('user_id', $user->id)));
         }
 
         $bookings = $query
@@ -133,6 +135,20 @@ class BookingController extends Controller
     }
 
     /**
+     * Guide Booking: reserve seats in a Tour Guide's published time slot.
+     */
+    public function createGuide(GuideAvailability $availability): View
+    {
+        abort_unless($availability->isBookable(), 404);
+
+        Gate::authorize('create', Booking::class);
+
+        return view('bookings.guide-create', [
+            'availability' => $availability->load('guide'),
+        ]);
+    }
+
+    /**
      * Combined Booking: pick both a tour package and a resort/room in one
      * checkout. Optional query params pre-select a starting point.
      */
@@ -175,6 +191,7 @@ class BookingController extends Controller
             $room = null;
             $resort = null;
             $package = null;
+            $availability = null;
             $total = 0;
 
             if ($data['room_id'] ?? null) {
@@ -201,23 +218,39 @@ class BookingController extends Controller
                 $total += (float) $package->price * (int) $data['guests'];
             }
 
-            return $request->user()->bookings()->create([
+            if ($data['guide_availability_id'] ?? null) {
+                // Lock the slot row so a concurrent booking can't slip past the
+                // capacity check below with a stale seat count.
+                $availability = GuideAvailability::query()->lockForUpdate()->findOrFail($data['guide_availability_id']);
+
+                abort_unless($availability->isBookable(), 422, 'This slot was just booked out.');
+                abort_if((int) $data['guests'] > $availability->remainingCapacity(), 422, 'Not enough seats left in this slot.');
+
+                $total += (float) $availability->price * (int) $data['guests'];
+            }
+
+            $booking = $request->user()->bookings()->create([
                 'resort_id' => $resort?->id,
                 'room_id' => $room?->id,
                 'tour_package_id' => $package?->id,
+                'guide_availability_id' => $availability?->id,
                 'booking_type' => $data['booking_type'],
                 'check_in_date' => $data['check_in_date'] ?? null,
                 'check_out_date' => $data['check_out_date'] ?? null,
-                'travel_date' => $data['travel_date'] ?? null,
+                'travel_date' => $data['travel_date'] ?? $availability?->available_date?->toDateString(),
                 'guests' => $data['guests'],
                 'total_amount' => $total,
                 'booking_status' => BookingStatus::PENDING->value,
                 'payment_status' => PaymentStatus::PENDING->value,
                 'special_request' => $data['special_request'] ?? null,
             ]);
+
+            $availability?->reserveSeats((int) $data['guests']);
+
+            return $booking;
         });
 
-        $booking->load(['resort.user', 'tourPackage.user', 'user']);
+        $booking->load(['resort.user', 'tourPackage.user', 'guideAvailability.guide', 'user']);
 
         $booking->user->notify(new BookingCreated($booking));
 
@@ -227,6 +260,10 @@ class BookingController extends Controller
 
         if ($booking->tourPackage) {
             $booking->tourPackage->user->notify(new NewBookingReceived($booking, 'tour package'));
+        }
+
+        if ($booking->guideAvailability) {
+            $booking->guideAvailability->guide->notify(new NewBookingReceived($booking, 'guide session'));
         }
 
         $session = $gateway->initiate($booking);
@@ -244,7 +281,7 @@ class BookingController extends Controller
     {
         Gate::authorize('view', $booking);
 
-        $booking->load(['user', 'resort', 'room', 'tourPackage']);
+        $booking->load(['user', 'resort', 'room', 'tourPackage', 'guideAvailability.guide']);
 
         $location = $booking->resort ?? $booking->tourPackage;
         $forecast = $location?->hasCoordinates()
@@ -270,8 +307,11 @@ class BookingController extends Controller
     {
         Gate::authorize('cancel', $booking);
 
+        $booking->load('guideAvailability');
+        $booking->guideAvailability?->releaseSeats($booking->guests);
+
         $booking->update(['booking_status' => BookingStatus::CANCELLED->value]);
-        $booking->load(['resort.user', 'tourPackage.user', 'user']);
+        $booking->load(['resort.user', 'tourPackage.user', 'guideAvailability.guide', 'user']);
 
         $booking->user->notify(new BookingCancelled($booking));
 
@@ -281,6 +321,10 @@ class BookingController extends Controller
 
         if ($booking->tourPackage) {
             $booking->tourPackage->user->notify(new BookingCancelled($booking));
+        }
+
+        if ($booking->guideAvailability) {
+            $booking->guideAvailability->guide->notify(new BookingCancelled($booking));
         }
 
         return redirect()

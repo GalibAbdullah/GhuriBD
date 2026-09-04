@@ -162,41 +162,52 @@ class GuideAvailabilityController extends Controller
         $data = $request->validated();
         $candidates = $request->matchingDates();
 
-        // Compared as cast Carbon dates rather than via whereIn: the column
-        // persists a midnight time component, so raw string matching misses.
-        $taken = GuideAvailability::query()
-            ->forGuide($guide)
-            ->whereDate('available_date', '>=', $candidates[0])
-            ->whereDate('available_date', '<=', end($candidates))
-            ->where('start_time', '<', $data['end_time'])
-            ->where('end_time', '>', $data['start_time'])
-            ->get()
-            ->map(fn (GuideAvailability $slot): string => $slot->available_date->toDateString())
-            ->all();
+        // Each candidate date is re-checked for conflicts immediately before
+        // its insert, inside one transaction — closing the window a plain
+        // "check all, then insert all" approach would leave open to a
+        // concurrent single-slot or bulk submission landing an overlapping
+        // slot in between the check and the insert.
+        $createdDates = DB::transaction(function () use ($guide, $candidates, $data): array {
+            $created = [];
 
-        $dates = array_values(array_diff($candidates, $taken));
+            foreach ($candidates as $date) {
+                $conflict = GuideAvailability::query()
+                    ->forGuide($guide)
+                    ->overlapping($date, $data['start_time'], $data['end_time'])
+                    ->exists();
 
-        if ($dates === []) {
+                if ($conflict) {
+                    continue;
+                }
+
+                try {
+                    $guide->guideAvailabilities()->create([
+                        'available_date' => $date,
+                        'start_time' => $data['start_time'],
+                        'end_time' => $data['end_time'],
+                        'capacity' => $data['capacity'],
+                        'price' => $data['price'],
+                        'status' => $data['status'],
+                        'notes' => $data['notes'] ?? null,
+                    ]);
+
+                    $created[] = $date;
+                } catch (UniqueConstraintViolationException) {
+                    // Lost a race against a concurrent submit of the same slot.
+                    continue;
+                }
+            }
+
+            return $created;
+        });
+
+        if ($createdDates === []) {
             return back()
                 ->withInput()
                 ->withErrors(['start_date' => 'Every date in that range already has an overlapping slot.']);
         }
 
-        DB::transaction(function () use ($guide, $dates, $data): void {
-            foreach ($dates as $date) {
-                $guide->guideAvailabilities()->create([
-                    'available_date' => $date,
-                    'start_time' => $data['start_time'],
-                    'end_time' => $data['end_time'],
-                    'capacity' => $data['capacity'],
-                    'price' => $data['price'],
-                    'status' => $data['status'],
-                    'notes' => $data['notes'] ?? null,
-                ]);
-            }
-        });
-
-        $created = count($dates);
+        $created = count($createdDates);
         $skipped = count($candidates) - $created;
 
         $message = "Published {$created} availability slot(s).";

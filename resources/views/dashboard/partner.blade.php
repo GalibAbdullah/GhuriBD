@@ -145,14 +145,16 @@
                     <div class="mt-2 small fw-semibold">Create tour package</div>
                 </a>
             </div>
-            <div class="col">
-                <a href="{{ route('partner.availability.index') }}" class="card card-body text-decoration-none h-100">
-                    <div class="text-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-                    </div>
-                    <div class="mt-2 small fw-semibold">Update availability</div>
-                </a>
-            </div>
+            @if (auth()->user()->isVerifiedTourGuide())
+                <div class="col">
+                    <a href="{{ route('partner.availability.index') }}" class="card card-body text-decoration-none h-100">
+                        <div class="text-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                        </div>
+                        <div class="mt-2 small fw-semibold">Update availability</div>
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

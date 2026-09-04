@@ -186,6 +186,33 @@ class GuideAvailability extends Model
             && ! $this->hasEnded();
     }
 
+    /**
+     * Claim seats for a new booking, flipping the slot to Booked once it's
+     * full. Callers must hold a row lock (lockForUpdate) so concurrent
+     * bookings can't both pass a capacity check against a stale count.
+     */
+    public function reserveSeats(int $count): void
+    {
+        $this->increment('booked_count', $count);
+
+        if ($this->isFullyBooked() && $this->status === AvailabilityStatus::AVAILABLE) {
+            $this->update(['status' => AvailabilityStatus::BOOKED->value]);
+        }
+    }
+
+    /**
+     * Release seats freed by a cancelled booking, reopening the slot if it
+     * was only Booked because it was full.
+     */
+    public function releaseSeats(int $count): void
+    {
+        $this->decrement('booked_count', min($count, $this->booked_count));
+
+        if (! $this->isFullyBooked() && $this->status === AvailabilityStatus::BOOKED) {
+            $this->update(['status' => AvailabilityStatus::AVAILABLE->value]);
+        }
+    }
+
     public function scopeForGuide(Builder $query, User|int $guide): Builder
     {
         return $query->where('user_id', $guide instanceof User ? $guide->id : $guide);

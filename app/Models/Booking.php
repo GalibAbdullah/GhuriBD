@@ -25,6 +25,7 @@ class Booking extends Model
         'resort_id',
         'room_id',
         'tour_package_id',
+        'guide_availability_id',
         'booking_type',
         'check_in_date',
         'check_out_date',
@@ -66,6 +67,11 @@ class Booking extends Model
         return $this->belongsTo(TourPackage::class);
     }
 
+    public function guideAvailability(): BelongsTo
+    {
+        return $this->belongsTo(GuideAvailability::class);
+    }
+
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
@@ -92,6 +98,11 @@ class Booking extends Model
     public function isCombined(): bool
     {
         return $this->booking_type === BookingType::COMBINED->value;
+    }
+
+    public function isGuide(): bool
+    {
+        return $this->booking_type === BookingType::GUIDE->value;
     }
 
     public function isPending(): bool
@@ -131,7 +142,7 @@ class Booking extends Model
      */
     public function relevantDate(): ?Carbon
     {
-        return $this->travel_date ?? $this->check_in_date;
+        return $this->travel_date ?? $this->check_in_date ?? $this->guideAvailability?->available_date;
     }
 
     /**
@@ -175,7 +186,8 @@ class Booking extends Model
     {
         return $query->where(function (Builder $query) use ($partner): void {
             $query->whereHas('resort', fn (Builder $query) => $query->where('user_id', $partner->id))
-                ->orWhereHas('tourPackage', fn (Builder $query) => $query->where('user_id', $partner->id));
+                ->orWhereHas('tourPackage', fn (Builder $query) => $query->where('user_id', $partner->id))
+                ->orWhereHas('guideAvailability', fn (Builder $query) => $query->where('user_id', $partner->id));
         });
     }
 

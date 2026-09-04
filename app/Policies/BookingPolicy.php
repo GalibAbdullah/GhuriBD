@@ -37,7 +37,8 @@ class BookingPolicy
 
         if ($user->hasRole(UserRole::TRAVEL_PARTNER->value)) {
             return $booking->resort?->user_id === $user->id
-                || $booking->tourPackage?->user_id === $user->id;
+                || $booking->tourPackage?->user_id === $user->id
+                || $booking->guideAvailability?->user_id === $user->id;
         }
 
         return false;
@@ -77,7 +78,8 @@ class BookingPolicy
     public function complete(User $user, Booking $booking): Response
     {
         $ownsService = $booking->resort?->user_id === $user->id
-            || $booking->tourPackage?->user_id === $user->id;
+            || $booking->tourPackage?->user_id === $user->id
+            || $booking->guideAvailability?->user_id === $user->id;
 
         if (! $ownsService) {
             return Response::denyWithStatus(403);

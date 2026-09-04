@@ -69,6 +69,7 @@ Route::middleware(['auth', 'traveler'])->group(function (): void {
     Route::get('bookings/resorts/{resort}/rooms/{room}/create', [BookingController::class, 'createResort'])->name('bookings.resorts.create');
     Route::get('bookings/packages/{package}/create', [BookingController::class, 'createPackage'])->name('bookings.packages.create');
     Route::get('bookings/combined/create', [BookingController::class, 'createCombined'])->name('bookings.combined.create');
+    Route::get('bookings/guides/{availability}/create', [BookingController::class, 'createGuide'])->name('bookings.guides.create');
     Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
 
     // Secure Online Payment — mock gateway checkout for a pending booking.

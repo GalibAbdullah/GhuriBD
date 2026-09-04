@@ -6,6 +6,7 @@ use App\Enums\BookingStatus;
 use App\Enums\BookingType;
 use App\Enums\UserRole;
 use App\Models\Booking;
+use App\Models\GuideAvailability;
 use App\Models\Room;
 use App\Models\TourPackage;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -38,6 +39,7 @@ class StoreBookingRequest extends FormRequest
             'check_in_date' => ['required_if:booking_type,resort,combined', 'nullable', 'date', 'after_or_equal:today'],
             'check_out_date' => ['required_if:booking_type,resort,combined', 'nullable', 'date', 'after:check_in_date'],
             'travel_date' => ['required_if:booking_type,package,combined', 'nullable', 'date', 'after_or_equal:today'],
+            'guide_availability_id' => ['required_if:booking_type,guide', 'nullable', 'integer', 'exists:guide_availabilities,id'],
             'guests' => ['required', 'integer', 'min:1', 'max:100'],
             'special_request' => ['nullable', 'string', 'max:1000'],
         ];
@@ -58,6 +60,7 @@ class StoreBookingRequest extends FormRequest
             'check_out_date.required_if' => 'Please choose a check-out date.',
             'check_out_date.after' => 'Check-out date must be after the check-in date.',
             'travel_date.required_if' => 'Please choose a travel date.',
+            'guide_availability_id.required_if' => 'Please select a guide availability slot.',
             'guests.required' => 'Please enter the number of guests.',
             'guests.min' => 'At least one guest is required.',
         ];
@@ -80,6 +83,10 @@ class StoreBookingRequest extends FormRequest
 
             if (in_array($type, [BookingType::PACKAGE->value, BookingType::COMBINED->value], true)) {
                 $this->validatePackageSelection($validator, $guests);
+            }
+
+            if ($type === BookingType::GUIDE->value) {
+                $this->validateGuideSelection($validator, $guests);
             }
         });
     }
@@ -165,6 +172,35 @@ class StoreBookingRequest extends FormRequest
             if ($duplicate) {
                 $validator->errors()->add('travel_date', 'You already have an active booking for this package on that date.');
             }
+        }
+    }
+
+    private function validateGuideSelection(Validator $validator, int $guests): void
+    {
+        $availability = GuideAvailability::find($this->input('guide_availability_id'));
+
+        if (! $availability) {
+            return;
+        }
+
+        if (! $availability->isBookable()) {
+            $validator->errors()->add('guide_availability_id', 'This slot is no longer available.');
+
+            return;
+        }
+
+        if ($guests > $availability->remainingCapacity()) {
+            $validator->errors()->add('guests', "Only {$availability->remainingCapacity()} seat(s) left in this slot.");
+        }
+
+        $duplicate = Booking::query()
+            ->where('user_id', $this->user()->id)
+            ->where('guide_availability_id', $availability->id)
+            ->whereIn('booking_status', [BookingStatus::PENDING->value, BookingStatus::CONFIRMED->value])
+            ->exists();
+
+        if ($duplicate) {
+            $validator->errors()->add('guide_availability_id', 'You already have an active booking for this slot.');
         }
     }
 }

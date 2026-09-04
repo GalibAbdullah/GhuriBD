@@ -35,12 +35,14 @@ class GuideController extends Controller
             })
             ->with(['providerVerifications' => function ($query): void {
                 $query->where('status', VerificationStatus::APPROVED->value)
-                    ->where('provider_type', ProviderType::TOUR_GUIDE->value);
+                    ->where('provider_type', ProviderType::TOUR_GUIDE->value)
+                    ->latest();
             }])
             ->withCount(['guideAvailabilities as upcoming_slots_count' => function ($query): void {
                 $query->bookable();
             }])
             ->orderByDesc('upcoming_slots_count')
+            ->orderBy('name')
             ->paginate(12)
             ->withQueryString();
 

@@ -139,6 +139,21 @@
                 </div>
             @endif
 
+            @if ($booking->guideAvailability)
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="h6 fw-semibold mb-3">Guide Session</h4>
+                        <div class="d-flex gap-3">
+                            <img src="{{ $booking->guideAvailability->guide->profile_photo_url }}" alt="{{ $booking->guideAvailability->guide->name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            <div class="flex-fill">
+                                <div class="fw-semibold">{{ $booking->guideAvailability->guide->name }}</div>
+                                <div class="small text-secondary">{{ $booking->guideAvailability->available_date->format('D, M j, Y') }} &middot; {{ $booking->guideAvailability->time_range }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if ($booking->special_request)
                 <div class="card mb-4">
                     <div class="card-body">
@@ -178,7 +193,7 @@
             @if ($audience === 'traveler')
                 <form method="POST" action="{{ route('messages.store') }}" class="mb-2">
                     @csrf
-                    <input type="hidden" name="recipient_id" value="{{ $booking->resort->user_id ?? $booking->tourPackage->user_id }}">
+                    <input type="hidden" name="recipient_id" value="{{ $booking->resort->user_id ?? $booking->tourPackage->user_id ?? $booking->guideAvailability->user_id }}">
                     <input type="hidden" name="body" value="Hi, I have a question about booking {{ $booking->booking_reference }}.">
                     <button type="submit" class="btn btn-outline-primary w-100">Message Provider</button>
                 </form>

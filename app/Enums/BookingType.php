@@ -7,6 +7,7 @@ enum BookingType: string
     case RESORT = 'resort';
     case PACKAGE = 'package';
     case COMBINED = 'combined';
+    case GUIDE = 'guide';
 
     public static function values(): array
     {

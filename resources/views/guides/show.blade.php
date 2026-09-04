@@ -65,6 +65,9 @@
                                         <th>Time</th>
                                         <th>Seats left</th>
                                         <th>Price</th>
+                                        @if (auth()->user()->hasRole(\App\Enums\UserRole::TRAVELER->value))
+                                            <th></th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -74,6 +77,11 @@
                                             <td>{{ $slot->time_range }}</td>
                                             <td>{{ $slot->remainingCapacity() }} / {{ $slot->capacity }}</td>
                                             <td class="font-monospace">৳{{ number_format((float) $slot->price, 2) }}</td>
+                                            @if (auth()->user()->hasRole(\App\Enums\UserRole::TRAVELER->value))
+                                                <td class="text-end">
+                                                    <a href="{{ route('bookings.guides.create', $slot) }}" class="btn btn-primary btn-sm">Book</a>
+                                                </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 </tbody>
