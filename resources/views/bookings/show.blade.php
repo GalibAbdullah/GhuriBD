@@ -173,6 +173,23 @@
                 </div>
             </div>
 
+            @if ($audience === 'traveler')
+                <form method="POST" action="{{ route('messages.store') }}" class="mb-2">
+                    @csrf
+                    <input type="hidden" name="recipient_id" value="{{ $booking->resort->user_id ?? $booking->tourPackage->user_id }}">
+                    <input type="hidden" name="body" value="Hi, I have a question about booking {{ $booking->booking_reference }}.">
+                    <button type="submit" class="btn btn-outline-primary w-100">Message Provider</button>
+                </form>
+                <a href="{{ route('complaints.create') }}" class="btn btn-outline-secondary w-100 mb-2">File a Complaint</a>
+            @elseif ($audience === 'partner')
+                <form method="POST" action="{{ route('messages.store') }}" class="mb-2">
+                    @csrf
+                    <input type="hidden" name="recipient_id" value="{{ $booking->user_id }}">
+                    <input type="hidden" name="body" value="Hi, this is regarding your booking {{ $booking->booking_reference }}.">
+                    <button type="submit" class="btn btn-outline-primary w-100">Message Traveler</button>
+                </form>
+            @endif
+
             @if ($audience === 'traveler' && $booking->isCancellable())
                 <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelBookingModal">Cancel Booking</button>
 

@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Booking;
+use App\Models\Complaint;
+use App\Models\Conversation;
 use App\Models\GuideAvailability;
 use App\Models\ProviderVerification;
 use App\Models\Payment;
@@ -12,6 +14,8 @@ use App\Models\TourPackage;
 use App\Payments\MockPaymentGateway;
 use App\Payments\PaymentGateway;
 use App\Policies\BookingPolicy;
+use App\Policies\ComplaintPolicy;
+use App\Policies\ConversationPolicy;
 use App\Policies\PaymentPolicy;
 use App\Policies\GuideAvailabilityPolicy;
 use App\Policies\ProviderVerificationPolicy;
@@ -40,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(TourPackage::class, TourPackagePolicy::class);
         Gate::policy(Booking::class, BookingPolicy::class);
         Gate::policy(Payment::class, PaymentPolicy::class);
+        Gate::policy(Conversation::class, ConversationPolicy::class);
+        Gate::policy(Complaint::class, ComplaintPolicy::class);
 
         // Feeds the notification bell (unread count + preview list) in the
         // shared layout, wherever it's rendered.

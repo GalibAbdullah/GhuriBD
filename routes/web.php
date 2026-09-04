@@ -7,7 +7,9 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\GuideAvailabilityController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
@@ -149,6 +151,31 @@ Route::middleware(['auth'])->group(function (): void {
     Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::get('/notifications/{notification}', [NotificationController::class, 'redirectTo'])->name('notifications.redirect');
     Route::put('/notifications/{notification}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+});
+
+// Live Chat with Provider — a Traveler's and a Travel Partner's shared
+// inbox; the policy scopes everything to conversations the user is in.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
+
+    Route::middleware('throttle:30,1')->group(function (): void {
+        Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+        Route::post('/messages/{conversation}/reply', [MessageController::class, 'reply'])->name('messages.reply');
+    });
+});
+
+// Complaint & Support System — Travelers/Partners file and track their own
+// complaints; Admins see every complaint and respond via the admin route.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('/complaints/create', [ComplaintController::class, 'create'])->name('complaints.create');
+    Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaints.store');
+    Route::get('/complaints/{complaint}', [ComplaintController::class, 'show'])->name('complaints.show');
+});
+
+Route::middleware(['auth', 'admin'])->group(function (): void {
+    Route::put('/admin/complaints/{complaint}', [ComplaintController::class, 'respond'])->name('admin.complaints.respond');
 });
 
 // Generic dashboard entry point — redirects each authenticated user to their role dashboard.
