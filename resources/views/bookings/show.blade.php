@@ -38,6 +38,22 @@
         <a href="{{ route($backRoute) }}" class="small fw-semibold link-secondary link-underline-opacity-0">&larr; Back to Bookings</a>
     </div>
 
+    @if ($audience === 'traveler' && $errors->has('payment'))
+        <div class="alert alert-danger">{{ $errors->first('payment') }}</div>
+    @endif
+
+    @if ($audience === 'traveler' && $booking->isAwaitingPayment())
+        <div class="card border-warning mb-4">
+            <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <h4 class="h6 fw-bold mb-1 text-warning-emphasis">Payment Pending</h4>
+                    <p class="mb-0 small text-secondary">Your reservation is held but not yet confirmed. Complete payment of <strong class="font-monospace">৳{{ number_format($booking->total_amount, 2) }}</strong> to confirm it.</p>
+                </div>
+                <a href="{{ route('payments.checkout', $booking) }}" class="btn btn-primary">Complete Payment</a>
+            </div>
+        </div>
+    @endif
+
     @if ($audience === 'traveler' && session('status') && str_contains(session('status'), 'confirmed'))
         <div class="card border-success mb-4">
             <div class="card-body d-flex align-items-center gap-3">

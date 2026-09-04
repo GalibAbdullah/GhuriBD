@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -64,6 +65,11 @@ class Booking extends Model
         return $this->belongsTo(TourPackage::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function isResort(): bool
     {
         return $this->booking_type === BookingType::RESORT->value;
@@ -97,6 +103,17 @@ class Booking extends Model
     public function isCompleted(): bool
     {
         return $this->booking_status === BookingStatus::COMPLETED->value;
+    }
+
+    public function isAwaitingPayment(): bool
+    {
+        return $this->payment_status === PaymentStatus::PENDING->value
+            && $this->booking_status !== BookingStatus::CANCELLED->value;
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === PaymentStatus::PAID->value;
     }
 
     /**

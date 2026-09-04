@@ -226,8 +226,8 @@ class BookingController extends Controller
         }
 
         return redirect()
-            ->route('traveler.bookings.show', $booking)
-            ->with('status', 'Booking confirmed! Your reference is '.$booking->booking_reference.'.');
+            ->route('payments.checkout', $booking)
+            ->with('status', 'Booking placed. Complete payment to confirm your reservation.');
     }
 
     /**

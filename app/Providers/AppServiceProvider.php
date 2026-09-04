@@ -5,10 +5,14 @@ namespace App\Providers;
 use App\Models\Booking;
 use App\Models\GuideAvailability;
 use App\Models\ProviderVerification;
+use App\Models\Payment;
 use App\Models\Resort;
 use App\Models\Room;
 use App\Models\TourPackage;
+use App\Payments\MockPaymentGateway;
+use App\Payments\PaymentGateway;
 use App\Policies\BookingPolicy;
+use App\Policies\PaymentPolicy;
 use App\Policies\GuideAvailabilityPolicy;
 use App\Policies\ProviderVerificationPolicy;
 use App\Policies\ResortPolicy;
@@ -22,7 +26,9 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // The mock gateway is the only implementation today; a real gateway
+        // (e.g. SSLCommerz) is a new binding here, not a controller rewrite.
+        $this->app->bind(PaymentGateway::class, MockPaymentGateway::class);
     }
 
     public function boot(): void
@@ -33,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(GuideAvailability::class, GuideAvailabilityPolicy::class);
         Gate::policy(TourPackage::class, TourPackagePolicy::class);
         Gate::policy(Booking::class, BookingPolicy::class);
+        Gate::policy(Payment::class, PaymentPolicy::class);
 
         // Feeds the notification bell (unread count + preview list) in the
         // shared layout, wherever it's rendered.

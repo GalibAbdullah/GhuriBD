@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\GuideAvailabilityController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
 use App\Http\Controllers\ResortController;
@@ -62,6 +63,11 @@ Route::middleware(['auth', 'traveler'])->group(function (): void {
     Route::get('bookings/packages/{package}/create', [BookingController::class, 'createPackage'])->name('bookings.packages.create');
     Route::get('bookings/combined/create', [BookingController::class, 'createCombined'])->name('bookings.combined.create');
     Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
+
+    // Secure Online Payment — mock gateway checkout for a pending booking.
+    Route::get('bookings/{booking}/checkout', [PaymentController::class, 'checkout'])->name('payments.checkout');
+    Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
+    Route::post('payments/{payment}/callback', [PaymentController::class, 'callback'])->middleware('throttle:10,1')->name('payments.callback');
 });
 
 // Travel Partner dashboard
