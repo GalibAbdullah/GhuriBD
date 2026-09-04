@@ -173,6 +173,8 @@
                 </div>
             </div>
 
+            @include('weather.partials._card', ['forecast' => $forecast, 'travelDate' => $booking->relevantDate()])
+
             @if ($audience === 'traveler')
                 <form method="POST" action="{{ route('messages.store') }}" class="mb-2">
                     @csrf

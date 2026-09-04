@@ -123,7 +123,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-body">
                     <h4 class="h6 fw-semibold mb-3">Meeting Information</h4>
                     <div class="list-group list-group-flush">
@@ -136,8 +136,13 @@
                             <span class="text-body">{{ $tourPackage->start_location }}</span>
                         </div>
                     </div>
+
+                    <hr>
+                    @include('maps.partials._view-map', ['model' => $tourPackage, 'title' => $tourPackage->title])
                 </div>
             </div>
+
+            @include('weather.partials._card', ['forecast' => $forecast])
         </div>
     </div>
 @endsection

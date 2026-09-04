@@ -42,4 +42,15 @@ class ResortFactory extends Factory
     {
         return $this->state(['status' => ResortStatus::INACTIVE->value]);
     }
+
+    /**
+     * A resort with a pinned map location.
+     */
+    public function withCoordinates(): static
+    {
+        return $this->state([
+            'latitude' => fake()->latitude(20.5, 26.6),
+            'longitude' => fake()->longitude(88.0, 92.7),
+        ]);
+    }
 }

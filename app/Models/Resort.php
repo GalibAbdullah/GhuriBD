@@ -25,6 +25,8 @@ class Resort extends Model
         'division',
         'district',
         'address',
+        'latitude',
+        'longitude',
         'contact_phone',
         'price_range',
         'amenities',
@@ -36,6 +38,8 @@ class Resort extends Model
     {
         return [
             'amenities' => 'array',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 
@@ -113,6 +117,26 @@ class Resort extends Model
     public function isInactive(): bool
     {
         return $this->status === ResortStatus::INACTIVE->value;
+    }
+
+    /**
+     * Whether the Travel Partner has pinned this resort's location.
+     */
+    public function hasCoordinates(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
+    }
+
+    /**
+     * A link that opens this resort's location directly in Google Maps.
+     */
+    public function googleMapsUrl(): ?string
+    {
+        if (! $this->hasCoordinates()) {
+            return null;
+        }
+
+        return "https://www.google.com/maps?q={$this->latitude},{$this->longitude}";
     }
 
     /**

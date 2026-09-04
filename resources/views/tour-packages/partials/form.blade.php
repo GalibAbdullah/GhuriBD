@@ -92,6 +92,10 @@
     </div>
 </div>
 
+@include('maps.partials._picker', ['latitude' => $tourPackage->latitude ?? null, 'longitude' => $tourPackage->longitude ?? null])
+@error('latitude')<div class="text-danger small fw-medium mb-3">{{ $message }}</div>@enderror
+@error('longitude')<div class="text-danger small fw-medium mb-3">{{ $message }}</div>@enderror
+
 <hr class="my-4">
 
 <h4 class="h6 fw-semibold mb-3">Itinerary</h4>
