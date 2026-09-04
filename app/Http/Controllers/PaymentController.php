@@ -6,6 +6,7 @@ use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Notifications\BookingPaid;
 use App\Payments\PaymentGateway;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -157,6 +158,18 @@ class PaymentController extends Controller
             return redirect()
                 ->route('traveler.bookings.show', $booking)
                 ->withErrors(['payment' => 'Sorry — this room was booked by someone else moments before your payment completed. You have been refunded.']);
+        }
+
+        $booking->load(['resort.user', 'tourPackage.user', 'user']);
+
+        $booking->user->notify(new BookingPaid($booking, 'traveler'));
+
+        if ($booking->resort) {
+            $booking->resort->user->notify(new BookingPaid($booking, 'partner', 'resort'));
+        }
+
+        if ($booking->tourPackage) {
+            $booking->tourPackage->user->notify(new BookingPaid($booking, 'partner', 'tour package'));
         }
 
         return redirect()

@@ -65,7 +65,7 @@ Route::middleware(['auth', 'traveler'])->group(function (): void {
     Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
 
     // Secure Online Payment — mock gateway checkout for a pending booking.
-    Route::get('bookings/{booking}/checkout', [PaymentController::class, 'checkout'])->name('payments.checkout');
+    Route::post('bookings/{booking}/checkout', [PaymentController::class, 'checkout'])->name('payments.checkout');
     Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
     Route::post('payments/{payment}/callback', [PaymentController::class, 'callback'])->middleware('throttle:10,1')->name('payments.callback');
 });

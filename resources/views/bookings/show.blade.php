@@ -49,7 +49,10 @@
                     <h4 class="h6 fw-bold mb-1 text-warning-emphasis">Payment Pending</h4>
                     <p class="mb-0 small text-secondary">Your reservation is held but not yet confirmed. Complete payment of <strong class="font-monospace">৳{{ number_format($booking->total_amount, 2) }}</strong> to confirm it.</p>
                 </div>
-                <a href="{{ route('payments.checkout', $booking) }}" class="btn btn-primary">Complete Payment</a>
+                <form method="POST" action="{{ route('payments.checkout', $booking) }}">
+                    @csrf
+                    <button type="submit" class="btn btn-primary">Complete Payment</button>
+                </form>
             </div>
         </div>
     @endif

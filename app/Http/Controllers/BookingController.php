@@ -17,6 +17,7 @@ use App\Models\TourPackage;
 use App\Notifications\BookingCancelled;
 use App\Notifications\BookingCreated;
 use App\Notifications\NewBookingReceived;
+use App\Payments\PaymentGateway;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -161,7 +162,7 @@ class BookingController extends Controller
      * always computed server-side from the current room/package prices —
      * never trusted from the request.
      */
-    public function store(StoreBookingRequest $request): RedirectResponse
+    public function store(StoreBookingRequest $request, PaymentGateway $gateway): RedirectResponse
     {
         Gate::authorize('create', Booking::class);
 
@@ -225,8 +226,10 @@ class BookingController extends Controller
             $booking->tourPackage->user->notify(new NewBookingReceived($booking, 'tour package'));
         }
 
+        $session = $gateway->initiate($booking);
+
         return redirect()
-            ->route('payments.checkout', $booking)
+            ->to($session->redirectUrl)
             ->with('status', 'Booking placed. Complete payment to confirm your reservation.');
     }
 
