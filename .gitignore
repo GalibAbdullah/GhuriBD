@@ -30,3 +30,5 @@ coverage
 
 # Local binaries
 /composer.phar
+
+/.claude
