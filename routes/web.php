@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\AdminAnalyticsController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\ResortController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TourPackageController;
+use App\Http\Controllers\TourPlanController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -133,6 +135,9 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
     // Booking System — Admin can view every booking
     Route::get('admin/bookings', [BookingController::class, 'index'])->name('admin.bookings.index');
     Route::get('admin/bookings/{booking}', [BookingController::class, 'show'])->name('admin.bookings.show');
+
+    // Admin Dashboard & Analytics
+    Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
 });
 
 // User profile management
@@ -176,6 +181,19 @@ Route::middleware(['auth'])->group(function (): void {
 
 Route::middleware(['auth', 'admin'])->group(function (): void {
     Route::put('/admin/complaints/{complaint}', [ComplaintController::class, 'respond'])->name('admin.complaints.respond');
+});
+
+// AI Tour Planner — a Traveler's own itineraries.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/tour-plans', [TourPlanController::class, 'index'])->name('tour-plans.index');
+    Route::get('/tour-plans/create', [TourPlanController::class, 'create'])->name('tour-plans.create');
+    Route::get('/tour-plans/{plan}', [TourPlanController::class, 'show'])->name('tour-plans.show');
+
+    Route::middleware('throttle:20,1')->group(function (): void {
+        Route::post('/tour-plans', [TourPlanController::class, 'store'])->name('tour-plans.store');
+        Route::post('/tour-plans/{plan}/regenerate', [TourPlanController::class, 'regenerate'])->name('tour-plans.regenerate');
+        Route::delete('/tour-plans/{plan}', [TourPlanController::class, 'destroy'])->name('tour-plans.destroy');
+    });
 });
 
 // Generic dashboard entry point — redirects each authenticated user to their role dashboard.

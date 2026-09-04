@@ -63,4 +63,30 @@ return [
         'max_bulk_range_days' => 90,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | AI Tour Planner
+    |--------------------------------------------------------------------------
+    |
+    | "rule_based" generates itineraries with a deterministic budget/interest
+    | allocator — no external API key or per-request cost, and fully testable.
+    | Swapping in a real LLM later is one binding change in AppServiceProvider,
+    | behind the same TourPlanner interface, not a rewrite of the feature.
+    |
+    */
+
+    'tour_planner' => [
+        'engine' => env('TOUR_PLANNER_ENGINE', 'rule_based'),
+
+        'min_days' => 1,
+        'max_days' => 14,
+
+        'min_budget' => 1000,
+        'max_budget' => 5000000,
+
+        // Reserved off the top for transport/food/misc before splitting the
+        // rest across days as each day's activity budget.
+        'logistics_reserve_percent' => 20,
+    ],
+
 ];

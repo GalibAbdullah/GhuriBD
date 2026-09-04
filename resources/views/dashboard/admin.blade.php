@@ -14,10 +14,14 @@
 
     <!-- Stats -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 mb-4">
-        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Total bookings (Aug)</div><div class="fs-3 fw-bold mt-2">0</div></div></div></div>
-        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Platform revenue</div><div class="fs-3 fw-bold mt-2 font-monospace">৳0</div></div></div></div>
+        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Bookings ({{ now()->format('M') }})</div><div class="fs-3 fw-bold mt-2">{{ $bookingsThisMonth }}</div></div></div></div>
+        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Platform revenue</div><div class="fs-3 fw-bold mt-2 font-monospace">৳{{ number_format($platformRevenue, 2) }}</div></div></div></div>
         <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Pending verifications</div><div class="fs-3 fw-bold mt-2">{{ $pendingCount }}</div></div></div></div>
-        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Open complaints</div><div class="fs-3 fw-bold mt-2">0</div></div></div></div>
+        <div class="col"><div class="card h-100"><div class="card-body"><div class="small text-secondary fw-semibold">Open complaints</div><div class="fs-3 fw-bold mt-2">{{ $openComplaintsCount }}</div></div></div></div>
+    </div>
+
+    <div class="mb-4 text-end">
+        <a href="{{ route('admin.analytics.index') }}" class="small fw-semibold link-primary link-underline-opacity-0">View full analytics &rarr;</a>
     </div>
 
     <!-- Verification queue -->
@@ -74,19 +78,37 @@
         @endif
     </div>
 
-    <!-- Complaints empty -->
+    <!-- Complaints -->
     <div>
         <div class="mb-3 d-flex align-items-center justify-content-between">
             <h3 class="h6">Open complaints</h3>
+            <a href="{{ route('complaints.index') }}" class="small fw-semibold link-primary link-underline-opacity-0">View all</a>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="empty-state">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mx-auto mb-3 text-body-tertiary" width="40" height="40"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg>
-                    <h3>No open complaints</h3>
-                    <p>Traveler and partner complaints will be tracked here.</p>
+
+        @if ($openComplaints->isEmpty())
+            <div class="card">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mx-auto mb-3 text-body-tertiary" width="40" height="40"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg>
+                        <h3>No open complaints</h3>
+                        <p>Traveler and partner complaints will be tracked here.</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        @else
+            <div class="card">
+                <div class="card-body p-0">
+                    @foreach ($openComplaints as $complaint)
+                        <a href="{{ route('complaints.show', $complaint) }}" class="d-flex align-items-center justify-content-between gap-3 border-bottom px-3 py-3 text-decoration-none text-body {{ $loop->last ? 'border-bottom-0' : '' }}">
+                            <div class="min-w-0">
+                                <div class="fw-semibold">{{ $complaint->subject }}</div>
+                                <div class="small text-secondary">{{ $complaint->user->name }} &middot; {{ $complaint->created_at->format('M d, Y') }}</div>
+                            </div>
+                            <span class="badge text-bg-warning flex-shrink-0">{{ $complaint->status }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
