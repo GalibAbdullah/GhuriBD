@@ -279,4 +279,20 @@ class BookingController extends Controller
             ->route('traveler.bookings.show', $booking)
             ->with('status', 'Booking cancelled.');
     }
+
+    /**
+     * Mark a confirmed booking as Completed. Only the Travel Partner who owns
+     * the booked resort/package may do this — it's what unlocks the
+     * traveler's ability to leave a review.
+     */
+    public function complete(Booking $booking): RedirectResponse
+    {
+        Gate::authorize('complete', $booking);
+
+        $booking->update(['booking_status' => BookingStatus::COMPLETED->value]);
+
+        return redirect()
+            ->route('partner.bookings.show', $booking)
+            ->with('status', 'Booking marked as completed.');
+    }
 }

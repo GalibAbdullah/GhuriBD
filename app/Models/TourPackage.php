@@ -72,6 +72,30 @@ class TourPackage extends Model
     }
 
     /**
+     * Travelers who have saved this tour package to their wishlist.
+     */
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Reviews left for this tour package.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Average star rating across all reviews, rounded to 1 decimal place.
+     */
+    public function averageRating(): float
+    {
+        return round((float) $this->reviews()->avg('rating'), 1);
+    }
+
+    /**
      * Serve the cover image from Laravel Storage (public disk).
      */
     protected function coverImageUrl(): Attribute

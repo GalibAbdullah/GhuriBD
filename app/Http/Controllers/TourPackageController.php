@@ -109,10 +109,14 @@ class TourPackageController extends Controller
     {
         Gate::authorize('view', $package);
 
-        $package = $package->load(['user', 'images']);
+        $package = $package->load(['user', 'images', 'reviews.user']);
 
         if ($request->user()->hasRole(UserRole::TRAVELER->value)) {
-            return view('traveler.tour-packages.show', ['tourPackage' => $package]);
+            return view('traveler.tour-packages.show', [
+                'tourPackage' => $package,
+                'isWishlisted' => $request->user()->wishlists()->where('tour_package_id', $package->id)->exists(),
+                'ratingCounts' => $package->reviews->countBy('rating'),
+            ]);
         }
 
         return view('tour-packages.show', [

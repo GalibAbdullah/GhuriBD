@@ -13,9 +13,11 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderVerificationController;
 use App\Http\Controllers\ResortController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TourPackageController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +70,15 @@ Route::middleware(['auth', 'traveler'])->group(function (): void {
     Route::post('bookings/{booking}/checkout', [PaymentController::class, 'checkout'])->name('payments.checkout');
     Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
     Route::post('payments/{payment}/callback', [PaymentController::class, 'callback'])->middleware('throttle:10,1')->name('payments.callback');
+
+    // Wishlist — a Traveler can save/remove resorts and tour packages.
+    Route::get('traveler/wishlist', [WishlistController::class, 'index'])->name('traveler.wishlist.index');
+    Route::post('wishlist/resorts/{resort}/toggle', [WishlistController::class, 'toggleResort'])->name('wishlist.resorts.toggle');
+    Route::post('wishlist/packages/{package}/toggle', [WishlistController::class, 'togglePackage'])->name('wishlist.packages.toggle');
+
+    // Reviews & Ratings — a Traveler may review a Completed booking once.
+    Route::get('traveler/bookings/{booking}/review', [ReviewController::class, 'create'])->name('traveler.reviews.create');
+    Route::post('traveler/bookings/{booking}/review', [ReviewController::class, 'store'])->name('traveler.reviews.store');
 });
 
 // Travel Partner dashboard
@@ -108,6 +119,12 @@ Route::middleware(['auth', 'partner'])->group(function (): void {
     // Booking System — read-only view of bookings for the Partner's own resorts/packages
     Route::get('partner/bookings', [BookingController::class, 'index'])->name('partner.bookings.index');
     Route::get('partner/bookings/{booking}', [BookingController::class, 'show'])->name('partner.bookings.show');
+    Route::patch('partner/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('partner.bookings.complete');
+
+    // Reviews & Ratings — Travel Partner views and replies to reviews on
+    // their own resorts/packages.
+    Route::get('partner/reviews', [ReviewController::class, 'partnerIndex'])->name('partner.reviews.index');
+    Route::patch('partner/reviews/{review}/reply', [ReviewController::class, 'reply'])->name('partner.reviews.reply');
 });
 
 // Admin dashboard
@@ -131,6 +148,10 @@ Route::middleware(['auth', 'admin'])->group(function (): void {
     // Booking System — Admin can view every booking
     Route::get('admin/bookings', [BookingController::class, 'index'])->name('admin.bookings.index');
     Route::get('admin/bookings/{booking}', [BookingController::class, 'show'])->name('admin.bookings.show');
+
+    // Reviews & Ratings — Admin can view and delete inappropriate reviews.
+    Route::get('admin/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');
+    Route::delete('admin/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 });
 
 // User profile management

@@ -37,17 +37,20 @@
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
             @foreach ($resorts as $resort)
                 <div class="col">
-                    <a href="{{ route('traveler.resorts.show', $resort) }}" class="card h-100 text-decoration-none text-reset">
-                        <img src="{{ $resort->cover_image_url }}" alt="{{ $resort->name }}" class="card-img-top" style="height: 160px; object-fit: cover;">
-                        <div class="card-body">
-                            <h4 class="h6 fw-semibold mb-1">{{ $resort->name }}</h4>
-                            <div class="small text-secondary mb-2">{{ $resort->district }}, {{ $resort->division }}</div>
-                            <div class="d-flex align-items-center justify-content-between">
-                                <span class="small fw-semibold">{{ $resort->price_range }}</span>
-                                <span class="badge text-bg-light border">{{ $resort->rooms_count }} {{ Str::plural('Room', $resort->rooms_count) }}</span>
+                    <div class="position-relative h-100">
+                        @include('wishlist.partials.heart-button', ['type' => 'resort', 'model' => $resort, 'wishlisted' => $wishlistedResortIds->contains($resort->id)])
+                        <a href="{{ route('traveler.resorts.show', $resort) }}" class="card h-100 text-decoration-none text-reset">
+                            <img src="{{ $resort->cover_image_url }}" alt="{{ $resort->name }}" class="card-img-top" style="height: 160px; object-fit: cover;">
+                            <div class="card-body">
+                                <h4 class="h6 fw-semibold mb-1">{{ $resort->name }}</h4>
+                                <div class="small text-secondary mb-2">{{ $resort->district }}, {{ $resort->division }}</div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small fw-semibold">{{ $resort->price_range }}</span>
+                                    <span class="badge text-bg-light border">{{ $resort->rooms_count }} {{ Str::plural('Room', $resort->rooms_count) }}</span>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
                 </div>
             @endforeach
         </div>

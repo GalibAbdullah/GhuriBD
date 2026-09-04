@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -68,6 +69,14 @@ class Booking extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * The single review left for this booking, if any.
+     */
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
     }
 
     public function isResort(): bool
@@ -138,6 +147,15 @@ class Booking extends Model
         $relevantDate = $this->relevantDate();
 
         return ! $relevantDate || $relevantDate->isFuture() || $relevantDate->isToday();
+    }
+
+    /**
+     * A booking can be reviewed once it's Completed and hasn't been
+     * reviewed yet.
+     */
+    public function isReviewable(): bool
+    {
+        return $this->isCompleted() && ! $this->review()->exists();
     }
 
     public function nights(): ?int
