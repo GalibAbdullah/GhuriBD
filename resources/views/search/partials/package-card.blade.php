@@ -1,12 +1,18 @@
 <div class="col">
     <div class="position-relative h-100">
         @include('wishlist.partials.heart-button', ['type' => 'package', 'model' => $package, 'wishlisted' => ($wishlistedPackageIds ?? collect())->contains($package->id)])
+        @if ($package->hasCoordinates())
+            <a href="{{ $package->googleMapsUrl() }}" target="_blank" rel="noopener" class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75 text-decoration-none" style="z-index: 2;" onclick="event.stopPropagation()">View on Map</a>
+        @endif
         <a href="{{ route('traveler.packages.show', $package) }}" class="card h-100 text-decoration-none text-reset shadow-sm">
             <img src="{{ $package->cover_image_url }}" alt="{{ $package->title }}" class="card-img-top" style="height: 160px; object-fit: cover;">
             <div class="card-body">
                 <span class="badge text-bg-primary-subtle text-primary-emphasis border border-primary-subtle mb-2">Tour Package</span>
                 <h4 class="h6 fw-semibold mb-1">{{ $package->title }}</h4>
-                <div class="small text-secondary mb-2">{{ $package->destination }} &middot; {{ $package->duration_days }}D / {{ $package->duration_nights }}N</div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="small text-secondary">{{ $package->destination }} &middot; {{ $package->duration_days }}D / {{ $package->duration_nights }}N</span>
+                    @include('weather.partials._badge', ['model' => $package])
+                </div>
 
                 <div class="d-flex align-items-center justify-content-between">
                     <span class="small fw-semibold font-monospace">৳{{ number_format($package->price, 2) }}</span>

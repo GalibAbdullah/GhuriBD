@@ -8,6 +8,7 @@ use App\Enums\UserRole;
 use App\Http\Requests\TourPackageRequest;
 use App\Models\TourPackage;
 use App\Models\TourPackageImage;
+use App\Weather\WeatherService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -105,7 +106,7 @@ class TourPackageController extends Controller
     /**
      * Show a single tour package. Accessible by its owning Travel Partner and by Admins.
      */
-    public function show(Request $request, TourPackage $package): View
+    public function show(Request $request, TourPackage $package, WeatherService $weather): View
     {
         Gate::authorize('view', $package);
 
@@ -116,6 +117,7 @@ class TourPackageController extends Controller
                 'tourPackage' => $package,
                 'isWishlisted' => $request->user()->wishlists()->where('tour_package_id', $package->id)->exists(),
                 'ratingCounts' => $package->reviews->countBy('rating'),
+                'forecast' => $package->hasCoordinates() ? $weather->forecast((float) $package->latitude, (float) $package->longitude) : null,
             ]);
         }
 

@@ -105,8 +105,13 @@
                             <span class="text-body">{{ $resort->address }}</span>
                         </div>
                     </div>
+
+                    <hr>
+                    @include('maps.partials._view-map', ['model' => $resort, 'title' => $resort->name])
                 </div>
             </div>
+
+            @include('weather.partials._card', ['forecast' => $forecast])
 
             <div class="card">
                 <div class="card-body">

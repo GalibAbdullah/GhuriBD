@@ -48,4 +48,15 @@ class TourPackageFactory extends Factory
     {
         return $this->state(['status' => TourPackageStatus::INACTIVE->value]);
     }
+
+    /**
+     * A tour package with a pinned destination.
+     */
+    public function withCoordinates(): static
+    {
+        return $this->state([
+            'latitude' => fake()->latitude(20.5, 26.6),
+            'longitude' => fake()->longitude(88.0, 92.7),
+        ]);
+    }
 }

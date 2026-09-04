@@ -18,6 +18,7 @@ use App\Notifications\BookingCancelled;
 use App\Notifications\BookingCreated;
 use App\Notifications\NewBookingReceived;
 use App\Payments\PaymentGateway;
+use App\Weather\WeatherService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -105,7 +106,7 @@ class BookingController extends Controller
     /**
      * Resort Booking: select a room within a resort, dates, and guest count.
      */
-    public function createResort(Resort $resort, Room $room): View
+    public function createResort(Resort $resort, Room $room, WeatherService $weather): View
     {
         abort_unless($room->resort_id === $resort->id, 404);
 
@@ -114,18 +115,20 @@ class BookingController extends Controller
         return view('bookings.resort-create', [
             'resort' => $resort,
             'room' => $room,
+            'forecast' => $resort->hasCoordinates() ? $weather->forecast((float) $resort->latitude, (float) $resort->longitude) : null,
         ]);
     }
 
     /**
      * Tour Package Booking: select a travel date and traveler count.
      */
-    public function createPackage(TourPackage $package): View
+    public function createPackage(TourPackage $package, WeatherService $weather): View
     {
         Gate::authorize('create', Booking::class);
 
         return view('bookings.package-create', [
             'package' => $package,
+            'forecast' => $package->hasCoordinates() ? $weather->forecast((float) $package->latitude, (float) $package->longitude) : null,
         ]);
     }
 
@@ -237,21 +240,26 @@ class BookingController extends Controller
      * Show a single booking. Accessible by its owning Traveler, by a Travel
      * Partner who owns the resort/package involved, and by Admins.
      */
-    public function show(Request $request, Booking $booking): View
+    public function show(Request $request, Booking $booking, WeatherService $weather): View
     {
         Gate::authorize('view', $booking);
 
         $booking->load(['user', 'resort', 'room', 'tourPackage']);
 
+        $location = $booking->resort ?? $booking->tourPackage;
+        $forecast = $location?->hasCoordinates()
+            ? $weather->forecast((float) $location->latitude, (float) $location->longitude)
+            : null;
+
         if ($request->user()->hasRole(UserRole::TRAVELER->value)) {
-            return view('bookings.show', ['booking' => $booking, 'audience' => 'traveler']);
+            return view('bookings.show', ['booking' => $booking, 'audience' => 'traveler', 'forecast' => $forecast]);
         }
 
         if ($request->user()->hasRole(UserRole::TRAVEL_PARTNER->value)) {
-            return view('bookings.show', ['booking' => $booking, 'audience' => 'partner']);
+            return view('bookings.show', ['booking' => $booking, 'audience' => 'partner', 'forecast' => $forecast]);
         }
 
-        return view('bookings.show', ['booking' => $booking, 'audience' => 'admin']);
+        return view('bookings.show', ['booking' => $booking, 'audience' => 'admin', 'forecast' => $forecast]);
     }
 
     /**

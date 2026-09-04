@@ -144,7 +144,7 @@ class SearchController extends Controller
     private function baseResortQuery(array $filters): Builder
     {
         return Resort::query()
-            ->select(['id', 'user_id', 'name', 'division', 'district', 'address', 'price_range', 'amenities', 'cover_image', 'status', 'created_at'])
+            ->select(['id', 'user_id', 'name', 'division', 'district', 'address', 'latitude', 'longitude', 'price_range', 'amenities', 'cover_image', 'status', 'created_at'])
             ->where('status', ResortStatus::ACTIVE->value)
             ->when($filters['q'], fn (Builder $query, string $q) => $query->searchKeyword($q))
             ->applyFilters($filters)
@@ -157,7 +157,7 @@ class SearchController extends Controller
     private function basePackageQuery(array $filters): Builder
     {
         return TourPackage::query()
-            ->select(['id', 'user_id', 'title', 'destination', 'division', 'district', 'duration_days', 'duration_nights', 'price', 'max_travelers', 'cover_image', 'status', 'created_at'])
+            ->select(['id', 'user_id', 'title', 'destination', 'division', 'district', 'latitude', 'longitude', 'duration_days', 'duration_nights', 'price', 'max_travelers', 'cover_image', 'status', 'created_at'])
             ->where('status', TourPackageStatus::ACTIVE->value)
             ->when($filters['q'], fn (Builder $query, string $q) => $query->searchKeyword($q))
             ->applyFilters($filters);

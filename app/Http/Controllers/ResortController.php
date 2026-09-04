@@ -8,6 +8,7 @@ use App\Enums\UserRole;
 use App\Http\Requests\ResortRequest;
 use App\Models\Resort;
 use App\Models\ResortImage;
+use App\Weather\WeatherService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -108,7 +109,7 @@ class ResortController extends Controller
     /**
      * Show a single resort. Accessible by its owning Travel Partner and by Admins.
      */
-    public function show(Request $request, Resort $resort): View
+    public function show(Request $request, Resort $resort, WeatherService $weather): View
     {
         Gate::authorize('view', $resort);
 
@@ -119,6 +120,7 @@ class ResortController extends Controller
                 'resort' => $resort,
                 'isWishlisted' => $request->user()->wishlists()->where('resort_id', $resort->id)->exists(),
                 'ratingCounts' => $resort->reviews->countBy('rating'),
+                'forecast' => $resort->hasCoordinates() ? $weather->forecast((float) $resort->latitude, (float) $resort->longitude) : null,
             ]);
         }
 

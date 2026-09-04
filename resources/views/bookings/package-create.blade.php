@@ -85,6 +85,8 @@
                         <button type="submit" class="btn btn-primary w-100 mt-4" id="submitBtn">Confirm Booking</button>
                     </div>
                 </div>
+
+                @include('weather.partials._card', ['forecast' => $forecast])
             </div>
         </div>
     </form>

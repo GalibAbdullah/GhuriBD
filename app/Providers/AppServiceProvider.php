@@ -31,6 +31,8 @@ use App\Policies\RoomPolicy;
 use App\Policies\TourPackagePolicy;
 use App\Policies\TourPlanPolicy;
 use App\Policies\WishlistPolicy;
+use App\Weather\OpenMeteoService;
+use App\Weather\WeatherService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -46,6 +48,11 @@ class AppServiceProvider extends ServiceProvider
         // Likewise: today's itinerary engine is rule-based; a real LLM later
         // is a new binding here, not a rewrite of the planner feature.
         $this->app->bind(TourPlanner::class, RuleBasedTourPlanner::class);
+
+        // Open-Meteo today (free, no API key); a different provider later is
+        // a new binding here, not a rewrite of every view/controller that
+        // shows weather.
+        $this->app->bind(WeatherService::class, OpenMeteoService::class);
     }
 
     public function boot(): void

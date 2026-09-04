@@ -31,6 +31,8 @@ class TourPackage extends Model
         'max_travelers',
         'meeting_point',
         'start_location',
+        'latitude',
+        'longitude',
         'itinerary',
         'included_services',
         'excluded_services',
@@ -44,6 +46,8 @@ class TourPackage extends Model
             'included_services' => 'array',
             'excluded_services' => 'array',
             'price' => 'decimal:2',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 
@@ -113,6 +117,26 @@ class TourPackage extends Model
     public function isInactive(): bool
     {
         return $this->status === TourPackageStatus::INACTIVE->value;
+    }
+
+    /**
+     * Whether the Travel Partner has pinned this package's destination.
+     */
+    public function hasCoordinates(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
+    }
+
+    /**
+     * A link that opens this package's destination directly in Google Maps.
+     */
+    public function googleMapsUrl(): ?string
+    {
+        if (! $this->hasCoordinates()) {
+            return null;
+        }
+
+        return "https://www.google.com/maps?q={$this->latitude},{$this->longitude}";
     }
 
     /**
