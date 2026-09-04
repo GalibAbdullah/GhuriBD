@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\GuideAvailabilityController;
+use App\Http\Controllers\GuideController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
@@ -202,6 +203,13 @@ Route::middleware(['auth'])->group(function (): void {
 
 Route::middleware(['auth', 'admin'])->group(function (): void {
     Route::put('/admin/complaints/{complaint}', [ComplaintController::class, 'respond'])->name('admin.complaints.respond');
+});
+
+// Browse Guides — verified Tour Guides and their upcoming bookable slots,
+// open to any authenticated role.
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/guides', [GuideController::class, 'index'])->name('guides.index');
+    Route::get('/guides/{guide}', [GuideController::class, 'show'])->name('guides.show');
 });
 
 // AI Tour Planner — a Traveler's own itineraries.
